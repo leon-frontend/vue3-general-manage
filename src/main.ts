@@ -3,8 +3,7 @@ import App from './App.vue'
 
 createApp(App).mount('#app')
 
-const func = () =>
-{
+const func = () => {
   console.log('这是没有格式化的代码')
 }
-func();
+func()
