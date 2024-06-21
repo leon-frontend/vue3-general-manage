@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div>我是App组件</div>
 </template>
 
 <script setup lang="ts" name="App">
