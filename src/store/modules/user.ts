@@ -1,12 +1,15 @@
 // 创建用户相关的小仓库
 import { defineStore } from 'pinia'
 import { reqLogin } from '@/api/user'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import type { LoginForm, LoginResponseData } from '@/api/user/type' // 引入ts数据类型
 // @/utils/token.ts文件封装本地存储数据与读取数据的方法
 import { SET_TOKEN, GET_TOKEN } from '@/utils/token'
+// 引入常量路由，将路由规则放入仓库中，方便组件根据路由动态生成数据
+import { constantRoutes } from '@/router/routes'
 
 export const useUserStore = defineStore('User', () => {
+  //#region ---------- 和 token & 发请求相关的业务处理 -------------
   // 1. 使用 ref/reactive 定义的响应式数据就是 state 中的数据
   // token是用户的唯一标识，并且实现localStorage的持久化
   // localStorage.getItem('TOKEN')的默认值是null
@@ -29,8 +32,13 @@ export const useUserStore = defineStore('User', () => {
       return Promise.reject(new Error(result.data.message))
     }
   }
+  //#endregion --------- 和token&发请求相关的业务处理 ---------------
+  
+  //#region ------------ 和路由相关的业务处理 ----------------
+  let menuRoutes = reactive(constantRoutes) // 常量路由数据
+  //#endregion --------- 和路由相关的业务处理 ----------------
 
-  // 3. 定义的computed函数就是 getters 配置项
 
-  return { token, userLogin }
+  // 暴露数据给外界使用
+  return { token, userLogin, menuRoutes }
 })

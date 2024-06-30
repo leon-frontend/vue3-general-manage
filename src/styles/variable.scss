@@ -1,2 +1,14 @@
 // 定义 scss 的全局变量
-// $color: red;
+
+// 左侧菜单栏的宽度和颜色
+$base-menu-width: 260px;
+$base-menu-backgound-color: #001529;
+
+// 顶部导航的高度
+$base-tabbar-height: 50px;
+
+// 左侧菜单栏logo高度设置
+$base-menu-logo-height: 50px;
+
+// 左侧菜单栏logo的文字大小
+$base-logo-title-fontsize: 20px;
