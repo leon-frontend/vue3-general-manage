@@ -1,49 +1,63 @@
+<script setup lang="ts" name="Layout">
+import Logo from './Logo/index.vue'
+import Menu from './Menu/index.vue'
+import Main from './Main/index.vue'
+import Tabbar from './Tabbar/index.vue'
+import { useUserStore } from '@/store/modules/user'
+import { useRoute } from 'vue-router'
+
+// 获取 Pinia 中的 userStore 仓库
+const userStore = useUserStore()
+
+// 使用 useRoute hook 获取路由, 通过 route 获取当前的路由路径
+const route = useRoute()
+</script>
+
 <template>
   <div class="layout_container">
     <!-- 左侧菜单 -->
     <div class="layout_slider">
-      <Logo></Logo>
+      <Logo />
       <!-- 展示路由菜单 -->
       <!-- 使用滚动组件，防止路由菜单太多超出范围 -->
       <el-scrollbar class="scrollbar">
         <!-- 菜单Menu组件，设置可折叠的路由菜单 -->
-        <el-menu style="--el-menu-bg-color: #001529; --el-menu-text-color: white">
+        <!-- default-active 属性表示页面加载时默认激活菜单的 index, 在 menu-item 中将 index 的值设置为了路由路径 -->
+        <el-menu
+          style="--el-menu-bg-color: #001529; --el-menu-text-color: white"
+          :default-active="route.path"
+        >
           <!-- 根据路由信息动态生成菜单 -->
-          <Menu :menuList="userStore.menuRoutes"></Menu>          
+          <Menu :menuList="userStore.menuRoutes"></Menu>
         </el-menu>
       </el-scrollbar>
     </div>
-    <!-- 顶部导航 -->
-    <div class="layout_tabbar">456</div>
+    <!-- 顶部导航展示区 -->
+    <div class="layout_tabbar">
+      <Tabbar />
+    </div>
     <!-- 内容展示区 -->
     <div class="layout_main">
-      <p style="height: 2000px; background-color: red;">我是一个段落</p>
+      <Main />
     </div>
   </div>
 </template>
-
-<script setup lang="ts" name="Layout">
-import Logo from './logo/index.vue' // 引入Logo组件
-import Menu from './menu/index.vue' // 引入菜单组件
-import { useUserStore } from '@/store/modules/user' // 获取小仓库，仓库中有常量路由数据
-const userStore = useUserStore()
-</script>
 
 <style lang="scss" scoped>
 .layout_container {
   width: 100%;
   height: 100vh;
-  color: white;
 
   .layout_slider {
     width: $base-menu-width;
     height: 100vh;
     background-color: $base-menu-backgound-color;
+    color: white;
 
     .scrollbar {
       width: 100%;
       height: calc(100vh - $base-menu-logo-height);
-      
+
       // el-menu标签默认右边框是1px，需要清除这个样式
       .el-menu {
         border-right: none;
@@ -55,7 +69,6 @@ const userStore = useUserStore()
     position: fixed;
     width: calc(100% - $base-menu-width);
     height: $base-tabbar-height;
-    background-color: cyan;
     left: $base-menu-width;
     top: 0px;
   }
@@ -64,7 +77,7 @@ const userStore = useUserStore()
     position: absolute;
     width: calc(100% - $base-menu-width);
     height: calc(100vh - $base-tabbar-height);
-    background-color: yellow;
+    background-color: red;
     left: $base-menu-width;
     top: $base-tabbar-height;
     padding: 20px;

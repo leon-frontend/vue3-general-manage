@@ -2,6 +2,7 @@ import { App } from 'vue'
 // 引入需要注册为全局组件的组件
 import SvgIcon from './SvgIcon/index.vue'
 import Pagination from './Pagination/index.vue'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 // 声明一个包含所有全局组件的对象，使用Record给对象的键值对添加类型
 const allGlobalComponents: Record<string, any> = { SvgIcon, Pagination }
@@ -16,5 +17,10 @@ export default {
     Object.keys(allGlobalComponents).forEach((item) =>
       app.component(item, allGlobalComponents[item]),
     )
+
+    // 将 element-plus 提供的所有图表注册为全局组件
+    for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+      app.component(key, component)
+    }
   },
 }

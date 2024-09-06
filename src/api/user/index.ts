@@ -11,6 +11,7 @@ enum API {
 // request.post<T, R> 是一个泛型方法，其中 T 是请求体的类型，R 是响应体的类型
 export const reqLogin = (data: LoginForm) =>
   request.post<any, LoginResponseData>(API.LOGIN_URL, data)
+
 // 2. 向外暴露获取用户信息的请求函数
 // request.get<T, R> 是一个泛型方法，其中 T 是请求体的类型，R 是响应体的类型
 export const reqUserInfo = () =>

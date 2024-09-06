@@ -4,7 +4,15 @@ import tseslint from 'typescript-eslint'
 import pluginVue from 'eslint-plugin-vue'
 
 export default [
-  { languageOptions: { globals: globals.browser } },
+  {
+    languageOptions: {
+      parser: '@typescript-eslint/parser', // 添加 ts 解析器
+      globals: {
+        ...globals.browser, // 保留之前的 globals 配置
+        process: 'readonly', // 声明 process 为只读的全局变量
+      },
+    },
+  },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   ...pluginVue.configs['flat/essential'],
@@ -22,6 +30,7 @@ export default [
       'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
       'no-unexpected-multiline': 'error', // 禁止空余的多行
       'no-useless-escape': 'off', // 禁止不必要的转义字符
+      'no-unused-vars': 'off',
 
       // typeScript (https://typescript-eslint.io/rules)
       '@typescript-eslint/no-unused-vars': 'error', // 禁止定义未使用的变量

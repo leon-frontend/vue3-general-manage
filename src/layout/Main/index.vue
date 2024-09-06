@@ -1,10 +1,5 @@
-# 01. 切换路由组件时，实现过渡动效
+<script setup lang="ts" name="Main"></script>
 
-- 文件位置：**`src/layout/Main/index.vue`**
-
-- 参考：https://router.vuejs.org/zh/guide/advanced/transitions.html
-
-```html
 <template>
   <!-- 路由组件的出口位置 -->
   <router-view v-slot="{ Component }">
@@ -14,12 +9,17 @@
     </transition>
   </router-view>
 </template>
+
 <style lang="scss" scoped>
-.fade-enter-from { opacity: 0; }
-.fade-enter-active { transition: all 0.7s; }
-.fade-enter-to { opacity: 1; }
+.fade-enter-from {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  transition: all 0.7s;
+}
+
+.fade-enter-to {
+  opacity: 1;
+}
 </style>
-```
-
-
-
