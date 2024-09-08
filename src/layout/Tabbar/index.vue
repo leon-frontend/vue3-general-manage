@@ -1,6 +1,5 @@
 <script setup lang="ts" name="Tabbar">
-import BreadCrumb from './BreadCrumb/index.vue'
-import Setting from './Setting/index.vue'
+import { BreadCrumb, Setting } from '@/layout'
 </script>
 
 <template>

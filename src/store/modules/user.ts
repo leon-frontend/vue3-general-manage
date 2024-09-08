@@ -9,7 +9,7 @@ import { SET_TOKEN, GET_TOKEN } from '@/utils/token'
 import { constantRoutes } from '@/router/routes'
 
 export const useUserStore = defineStore('User', () => {
-  //#region ---------- 和 token & 发请求相关的业务处理 -------------  
+  //#region ---------- 和 token & 发请求相关的业务处理 -------------
   /**
    * 1. 使用 ref/reactive 定义的响应式数据就是 state 中的数据。
    * token 是用户的唯一标识，并且实现localStorage的持久化。
@@ -32,14 +32,14 @@ export const useUserStore = defineStore('User', () => {
       SET_TOKEN(result.data.token as string)
 
       // 保证返回成功状态的Promise对象
-      return 'ok' 
+      return 'ok'
     } else {
       // 2.请求失败，则返回失败的Promise，并且弹出失败信息
       return Promise.reject(new Error(result.data.message))
     }
   }
   //#endregion --------- 和token&发请求相关的业务处理 ---------------
-  
+
   //#region ------------ 和路由相关的业务处理 ----------------
   const menuRoutes = reactive(constantRoutes) // 常量路由数据
   //#endregion --------- 和路由相关的业务处理 ----------------

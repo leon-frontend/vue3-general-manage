@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import { viteMockServe } from 'vite-plugin-mock'
-import VueSetupExtend from "vite-plugin-vue-setup-extend"
+import VueSetupExtend from 'vite-plugin-vue-setup-extend'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -18,7 +18,7 @@ export default defineConfig(({ command }) => {
       viteMockServe({
         enable: command === 'serve', //用于判断当前的环境，只用于开发环境
       }),
-      VueSetupExtend()
+      VueSetupExtend(),
     ],
     resolve: {
       alias: {

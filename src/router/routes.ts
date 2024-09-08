@@ -18,9 +18,9 @@ export const constantRoutes = [
     component: () => import('@/layout/index.vue'),
     redirect: '/home', // 重定向到 home 页面
     meta: {
-      title: 'Layout', // 动态生成路由时展示的标题
+      title: '', // 动态生成路由时展示的标题
       hidden: false, // 代表路由标题在导航栏中是否隐藏，true表示隐藏，false 表示不隐藏(若省略该属性, 也表示不隐藏)
-      icon: 'Avatar',
+      icon: '',
     },
     children: [
       {
@@ -50,6 +50,7 @@ export const constantRoutes = [
       title: '权限管理', // 动态生成路由时展示的标题
       icon: 'Lock',
     },
+    redirect: '/auth/user',
     children: [
       {
         name: 'User',
@@ -88,6 +89,7 @@ export const constantRoutes = [
       title: '商品管理', // 动态生成路由时展示的标题
       icon: 'Goods',
     },
+    redirect: '/product/trademark',
     children: [
       {
         name: 'TradeMark',

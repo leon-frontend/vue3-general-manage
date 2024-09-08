@@ -1,13 +1,15 @@
 <script setup lang="ts" name="Layout">
-import Logo from './Logo/index.vue'
-import Menu from './Menu/index.vue'
-import Main from './Main/index.vue'
-import Tabbar from './Tabbar/index.vue'
-import { useUserStore } from '@/store/modules/user'
+import { Logo, Menu, Main, Tabbar } from '@/layout'
+import { useSettingStore, useUserStore } from '@/store/modules'
+import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 
-// 获取 Pinia 中的 userStore 仓库
+// 获取 Pinia 中的 userStore 仓库和 settingStore 仓库
 const userStore = useUserStore()
+const settingStore = useSettingStore()
+
+// 响应式解构出 settingStore 中的响应式数据
+const { fold } = storeToRefs(settingStore)
 
 // 使用 useRoute hook 获取路由, 通过 route 获取当前的路由路径
 const route = useRoute()
@@ -16,7 +18,7 @@ const route = useRoute()
 <template>
   <div class="layout_container">
     <!-- 左侧菜单 -->
-    <div class="layout_slider">
+    <div class="layout_slider" :class="{ fold: fold }">
       <Logo />
       <!-- 展示路由菜单 -->
       <!-- 使用滚动组件，防止路由菜单太多超出范围 -->
@@ -26,18 +28,19 @@ const route = useRoute()
         <el-menu
           style="--el-menu-bg-color: #001529; --el-menu-text-color: white"
           :default-active="route.path"
+          :collapse="fold"
         >
           <!-- 根据路由信息动态生成菜单 -->
           <Menu :menuList="userStore.menuRoutes"></Menu>
         </el-menu>
       </el-scrollbar>
     </div>
-    <!-- 顶部导航展示区 -->
-    <div class="layout_tabbar">
+    <!-- 顶部展示区 -->
+    <div class="layout_tabbar" :class="{ fold: fold }">
       <Tabbar />
     </div>
     <!-- 内容展示区 -->
-    <div class="layout_main">
+    <div class="layout_main" :class="{ fold: fold }">
       <Main />
     </div>
   </div>
@@ -53,6 +56,11 @@ const route = useRoute()
     height: 100vh;
     background-color: $base-menu-backgound-color;
     color: white;
+    transition: all 0.5s;
+
+    &.fold {
+      width: $base-menu-min-width;
+    }
 
     .scrollbar {
       width: 100%;
@@ -71,6 +79,12 @@ const route = useRoute()
     height: $base-tabbar-height;
     left: $base-menu-width;
     top: 0px;
+    transition: all 0.5s;
+
+    &.fold {
+      width: calc(100vw - $base-menu-min-width);
+      left: $base-menu-min-width;
+    }
   }
 
   .layout_main {
@@ -82,6 +96,12 @@ const route = useRoute()
     top: $base-tabbar-height;
     padding: 20px;
     overflow: auto; // 加滚动条，其样式写在index.scss文件中，作为全局样式
+    transition: all 0.5s;
+
+    &.fold {
+      width: calc(100vw - $base-menu-min-width);
+      left: $base-menu-min-width;
+    }
   }
 }
 </style>
