@@ -14,7 +14,7 @@ export interface LoginResponseData {
 }
 
 // 2. 定义服务器返回用户信息的数据类型
-interface CheckUser {
+export interface CheckUser {
   userId: number
   avatar: string
   username: string
@@ -25,6 +25,7 @@ interface CheckUser {
   routes: string[]
   token: string
 }
+
 export interface UserResponseData {
   code: number
   data: { checkUser: CheckUser }

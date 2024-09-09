@@ -30,7 +30,6 @@ const handleRoute = (item: MenuItemRegistered): void => {
       v-if="!item.children && !item.meta.hidden"
       :index="item.path"
       @click="handleRoute"
-      class="el-menu-vertical-demo"
     >
       <!-- 根据 item.meta.icon 中的值渲染图标 -->
       <!-- 注意: 当菜单折叠之后, 只有将图标放在插槽的外面时才会展示图标 -->

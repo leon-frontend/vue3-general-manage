@@ -21,8 +21,16 @@ const app = createApp(App)
 app.use(ElementPlus, {
   locale: zhCn, // 将组件库中的语言设置成中文
 })
-app.use(globalComponent) // 使用use方法安装自定义插件
-app.use(pinia) // 注册pinia
-app.use(router) // 注册路由
+
+// 使用 use 方法安装自定义插件
+app.use(globalComponent)
+
+// 注册 pinia
+app.use(pinia)
+
+// 注册路由
+app.use(router)
+
+import '@/router/permission' // 引入路由鉴权的文件
 
 app.mount('#app')

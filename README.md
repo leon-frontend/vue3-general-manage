@@ -1,4 +1,6 @@
-# 01. 切换路由组件时，实现过渡动效
+# 01. 路由切换 & 路由守卫
+
+## 1.1 切换路由组件时，实现过渡动效
 
 - 文件位置：**`src/layout/Main/index.vue`**
 
@@ -27,7 +29,84 @@
 </style>
 ```
 
-# 02. 实现面包屑
+## 1.2 任意路由切换时展示进度条 & 全局路由守卫
+
+- 使用 **nprogress 库**实现，该库是一个 JS 库，由于没有 TS 类型定义，所以还需要安装 **@types/nprogress 库**来给其提供 TS 类型，防止编译时报错。
+- 在引入该库时，**一定要引入其 CSS 样式文件**，并且可以在该样式文件中自定义样式。
+-  **全局路由守卫**：任意路由切换都会触发的钩子。
+
+```ts
+// 1. ----------------- 安装 nprogress 库和 @types/nprogress 库 -----------------
+pnpm add --save nprogress
+pnpm add --save-dev @types/nprogress
+
+// 2. ----------------- 利用全局路由守卫实现任意路由切换时展示进度条 -----------------
+import router from '@/router'
+import nprogress from 'nprogress'
+import 'nprogress/nprogress.css' // 一定要引入进度条的样式
+
+// 全局前置守卫：访问任意路由之前会触发的钩子。to 指将要访问的路由；from 指从哪个路由而来；next 指路由的放行函数
+router.beforeEach((to, from, next) => {  
+  nprogress.start() // 在前置守卫中开启进度条
+  next()
+})
+
+// 全局后置守卫：在后置守卫中实现进度条"终止"
+router.afterEach((to, from) => { nprogress.done() })
+```
+
+## 1.3 路由鉴权 & 全局路由守卫
+
+- 使用 **token** 实现路由鉴权，即路由组件的访问权限设置。
+- **全部路由组件**：**`login|404|Home|Screen|Auth(三个子路由)|Product(四个子路由)`**
+- **用户未登录的情况**：用户未登录时，**只能访问 Login 页面**。访问其他页面时，重定向至 Login 页面，并**将想要访问的页面作为 query 参数携带在路由中**，用于用户登录成功后，直接跳转到指定页面（查看 **04.用户登录**）。
+- **用户登录成功的情况**：用户登录成功之后，**不能访问 Login 页面**，会直接重定向至首页。其他路由组件正常访问。
+- **获取用户信息**：用户登陆成功后，访问除了 Login 以外的组件时，都需要获取"用户姓名和用户头像"信息**供顶部展示区域使用**。
+  - 若用户信息存在，则直接放行；
+  - 若用户信息不存在（如刷新页面会清除仓库中的 token 数据），则**发送获取用户信息的请求**。
+    - 当请求成功获取用户信息时，放行；
+    - 若请求失败（如 token 失效），则首先需要退出登录，然后将路由重定向至 Login 页面。
+- 访问某一个路由页面时，**动态切换标签页的标题**。
+
+```ts
+// 实现路由鉴权
+router.beforeEach(async (to, from, next) => {  
+  document.title = '硅谷甄选 - ' + to.meta.title // 访问某一个路由页面时，动态切换标签页的标题  
+  nprogress.start() // 在前置守卫中开启进度条
+
+  // 从 userStore 小仓库中获取 token、用户姓名和用户头像
+  const { token, userName, getUserInfo, userLogout } = userStore
+
+  // token 若存在，则表示用户已登录；token 若不存在，则表示用户未登录
+  if (token) {
+    // 用户登录成功的情况
+    if (to.path === '/login')  next({ path: '/' })      
+    else {
+      // 若用户信息存在，则直接放行；若用户信息不存在，则发送获取用户信息的请求之后，再放行
+      if (userName) next() // 用户信息存在，直接放行
+      else {
+        // 用户信息不存在的情况
+        try {         
+          await getUserInfo() // 发请求获取用户信息          
+          next() // 获取用户信息成功之后，放行
+        } catch (error) {
+          // 发请求获取用户信息失败时（如 token 过期），会执行下面的代码
+          userLogout() // 首先退出登录：清空用户的相关数据
+          next({ path: '/login', query: { redirect: to.path } }) // 重定向至 Login 页面，并携带原本要访问的路由
+        }
+      }
+    }
+  } else {
+	// 用户未登录的情况
+    if (to.path === '/login') next()
+    else next({ path: '/login', query: { redirect: to.path } })
+  }
+})
+```
+
+# 02. 顶部展示区域
+
+## 2.1 实现面包屑
 
 - **根据当前匹配的路由，动态生成"面包屑"的 HTML 结构**：使用 **`route.matched`** 属性获取当前匹配的所有路由，比如若当前路由是 **`/auth/user`** ，则该属性会返回一个**包含一级路由信息和二级路由信息的数组**，即**`[{path: '/auth', ...}, {path: '/auth/user', ...}]`**。然后使用 **v-for** 指令根据这个数组动态渲染 HTML 结构。
 - **特殊处理"首页"的"面包屑"渲染**：首页匹配的路由是二级路由，但是由于其一级路由是 **`'/'`**，所以**不需要渲染一级路由的信息**。在配置 **`'/'`** 路由信息时，**不要配置 title 属性**，然后使用路由信息 **`v-show="item.meta.title"`** 进行条件渲染即可。
@@ -36,7 +115,11 @@
 ```html
 <el-breadcrumb separator-icon="ArrowRight">
   <!-- 面包屑动态展示路由名字与标题 -->
-  <el-breadcrumb-item v-for="item in route.matched" :key="item.path" v-show="item.meta.title">
+  <el-breadcrumb-item
+    v-for="item in route.matched"
+    :key="item.path"
+    v-show="item.meta.title"
+  >
     <!-- 面包屑展示匹配路由的图标 -->
     <el-icon style="margin-right: 5px">
       <component :is="item.meta.icon" />
@@ -46,4 +129,40 @@
   </el-breadcrumb-item>
 </el-breadcrumb>
 ```
+
+## 2.2 实现全屏模式
+
+- **document.fullscreenElement** 属性是 DOM 对象的一个属性，可以判断当前是不是全屏模式。若是全屏模式，则返回 true；若不是全屏模式，则返回 false。
+- **全屏模式的切换**：使用 **`document.documentElement.requestFullScreen()`** 方法实现全屏模式；使用 **`document.exitFullScreen()`** 方法退出全屏模式。
+
+```ts
+// handleFullScreen 作为"全屏"按钮的点击事件回调
+const handleFullScreen = () => {
+  // fullscreenElement 属性(DOM 对象的一个属性)可以判断当前是不是全屏模式。
+  let fullScreen = document.fullscreenElement
+
+  // 全屏模式的切换
+  fullScreen ? document.exitFullscreen() : document.documentElement.requestFullscreen()
+}
+```
+
+# 04. 用户登录
+
+- 用户退出登陆时，要记录当前展示的页面，当用户再次登录时，需要直接**重定向到用户退出登录前的页面**。可以使用**路由传参**实现。
+
+```ts
+// 用户退出登录，重定向到"登录页面"，此时可以使用路由传参的方式需要记录当前展示的页面
+$router.push({ path: '/login', query: { redirect: $route.path } })
+
+// ---------------------- Login.vue 组件 ----------------------
+/**
+ * 请求成功则利用编程式路由导航跳转页面。
+ * 判断路由中是否存在 query 参数，若存在则跳转到 query 参数指定的路由
+ * 注：query 参数中的 rediect 的属性值保存了上次退出登陆时展示的页面
+ */
+const redirect = $route.query.redirect
+redirect ? $router.push({ path: redirect as string }) : $router.push({ path: '/' })
+```
+
+
 

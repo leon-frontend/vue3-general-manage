@@ -1,25 +1,26 @@
 // 创建用户相关的小仓库
 import { defineStore } from 'pinia'
-import { reqLogin } from '@/api/user'
 import { reactive, ref } from 'vue'
-import type { LoginForm, LoginResponseData } from '@/api/user/type' // 引入ts数据类型
-// @/utils/token.ts文件封装本地存储数据与读取数据的方法
 import { SET_TOKEN, GET_TOKEN } from '@/utils/token'
-// 引入常量路由，将路由规则放入仓库中，方便组件根据路由动态生成数据
 import { constantRoutes } from '@/router/routes'
+import type { LoginForm, LoginResponseData } from '@/api/user/type'
+import { reqLogin, reqUserInfo } from '@/api/user'
 
+/**
+ * 使用组合式 API 创建 userStore 仓库：
+ * 1. 使用 ref/reactive 定义的响应式数据就是 state 中的数据。
+ * 2. 定义的函数就是 actions 中的方法。
+ */
 export const useUserStore = defineStore('User', () => {
-  //#region ---------- 和 token & 发请求相关的业务处理 -------------
+  //#region ---------- 1. token 和用户登录相关的业务处理 -------------
   /**
-   * 1. 使用 ref/reactive 定义的响应式数据就是 state 中的数据。
    * token 是用户的唯一标识，并且实现localStorage的持久化。
    * localStorage.getItem('TOKEN') 的默认值是 null。
    * <string | null> 对 localStorage.getItem('TOKEN') 的类型进行限制。
    */
   const token = ref<string | null>(GET_TOKEN())
 
-  // 2. 定义的函数就是actions中的方法
-  // userLogin是用户登陆时调用的方法
+  // userLogin 函数是用户登陆时调用的方法
   const userLogin = async (data: LoginForm) => {
     const result: LoginResponseData = await reqLogin(data)
 
@@ -34,16 +35,59 @@ export const useUserStore = defineStore('User', () => {
       // 保证返回成功状态的Promise对象
       return 'ok'
     } else {
-      // 2.请求失败，则返回失败的Promise，并且弹出失败信息
+      // 请求失败，则返回失败的Promise，并且弹出失败信息
       return Promise.reject(new Error(result.data.message))
     }
   }
-  //#endregion --------- 和token&发请求相关的业务处理 ---------------
 
-  //#region ------------ 和路由相关的业务处理 ----------------
+  // userLogout 函数是用户退出登录时调用的方法
+  const userLogout = () => {
+    // 清空仓库当中与当前用户想关的数据
+    token.value = ''
+    userName.value = ''
+    userAvatar.value = ''
+
+    // 清空 localStorage 中的 token 信息
+    localStorage.removeItem('TOKEN')
+  }
+  //#endregion --------- 1. token 和用户登录相关的业务处理 ---------------
+
+  //#region ------------- 2. 用户信息相关的业务处理 ---------------
+  // userName 响应式数据指用户姓名；userAvatar 响应式数据指用户头像
+  const userName = ref<string>('')
+  const userAvatar = ref<string>('')
+
+  // useInfo 函数用于获取用户信息的方法
+  const getUserInfo = async () => {
+    // 获取用户信息（用户头像、姓名等信息）并存储在仓库当中
+    const result = await reqUserInfo()
+
+    // 如果用户信息获取成功，则存储用户的姓名和头像信息
+    if (result.code === 200) {
+      userName.value = result.data.checkUser.username
+      userAvatar.value = result.data.checkUser.avatar
+
+      // 获取用户信息成功，返回"成功"的 Promise 对象
+      return 'ok'
+    } else {
+      // 请求失败，则返回失败的 Promise 对象
+      return Promise.reject('获取用户信息失败')
+    }
+  }
+  //#endregion ---------- 2. 用户信息相关的业务处理 -------------
+
+  //#region ------------ 3. 和路由相关的业务处理 ----------------
   const menuRoutes = reactive(constantRoutes) // 常量路由数据
-  //#endregion --------- 和路由相关的业务处理 ----------------
+  //#endregion --------- 3. 和路由相关的业务处理 ----------------
 
   // 暴露数据给外界使用
-  return { token, userLogin, menuRoutes }
+  return {
+    token,
+    userLogin,
+    userLogout,
+    userName,
+    userAvatar,
+    getUserInfo,
+    menuRoutes,
+  }
 })

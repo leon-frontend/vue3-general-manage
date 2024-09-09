@@ -1,8 +1,8 @@
 <script setup lang="ts" name="Login">
-import { User, Lock } from '@element-plus/icons-vue'
 import { reactive, ref } from 'vue'
-import { useUserStore } from '@/store/modules/user' // 引入用户相关的小仓库
-import { useRouter } from 'vue-router'
+import { useUserStore } from '@/store/modules' // 引入用户相关的小仓库
+import { useRoute, useRouter } from 'vue-router'
+import { User, Lock } from '@element-plus/icons-vue'
 import { ElNotification } from 'element-plus'
 import { getTime } from '@/utils/time' // 引入获取当前时间的函数
 
@@ -11,11 +11,11 @@ const loginForm = reactive({ username: 'admin', password: '111111' })
 
 // 获取 el-form 组件实例
 const form = ref()
-// console.log(form.value)
 
 // --------------- 点击登录按钮后,发送用户登录请求并跳转页面 --------------------
-// 获取路由器，用于编程式路由导航
+// 获取路由器和路由
 const $router = useRouter()
+const $route = useRoute()
 
 // 创建user小仓库的实例
 const userStore = useUserStore()
@@ -35,9 +35,15 @@ const handleLogin = async () => {
   try {
     await userStore.userLogin(loginForm)
 
-    // 下面的代码只会在用户登陆成功时执行
-    // 请求成功则展示首页信息，利用编程式路由导航跳转页面
-    $router.push('/')
+    /**
+     * 请求成功则利用编程式路由导航跳转页面
+     * 判断路由中是否存在 query 参数，若存在则跳转到 query 参数指定的路由
+     * 注：query 参数中的 rediect 的属性值保存了上次退出登陆时展示的页面
+     */
+    const redirect = $route.query.redirect
+    redirect
+      ? $router.push({ path: redirect as string })
+      : $router.push({ path: '/' })
 
     // 使用elementPlus中的组件展示 登陆成功 的提示信息
     ElNotification({

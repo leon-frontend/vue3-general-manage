@@ -7,5 +7,8 @@ export const useSettingStore = defineStore('Setting', () => {
   // fold 响应式数据，用于控制左侧菜单栏的"折叠"和"收起"
   const fold = ref<Boolean>(false)
 
-  return { fold }
+  // refresh 响应式数据用于控制顶部展示区域的"刷新功能"
+  const refresh = ref<Boolean>(false)
+
+  return { fold, refresh }
 })

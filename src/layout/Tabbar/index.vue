@@ -37,6 +37,7 @@ import { BreadCrumb, Setting } from '@/layout'
   .tabbar-right {
     display: flex;
     align-items: center;
+    margin-right: 20px;
   }
 }
 </style>

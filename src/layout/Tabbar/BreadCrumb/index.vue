@@ -31,10 +31,12 @@ const route = useRoute()
       v-show="item.meta.title"
       :to="item.path"
     >
-      <!-- 面包屑展示匹配路由的图标 -->
-      <el-icon style="margin-right: 5px">
-        <component :is="item.meta.icon" />
-      </el-icon>
+      <!-- 面包屑展示匹配路由的图标，并检查图标是否存在 -->
+      <template v-if="item.meta.icon">
+        <el-icon style="margin-right: 5px">
+          <component :is="item.meta.icon" />
+        </el-icon>
+      </template>
       <!-- 面包屑展示匹配路由的标题 -->
       <span>{{ item.meta.title }}</span>
     </el-breadcrumb-item>

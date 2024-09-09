@@ -29,6 +29,7 @@ const route = useRoute()
           style="--el-menu-bg-color: #001529; --el-menu-text-color: white"
           :default-active="route.path"
           :collapse="fold"
+          :collapse-transition="false"
         >
           <!-- 根据路由信息动态生成菜单 -->
           <Menu :menuList="userStore.menuRoutes"></Menu>
@@ -56,7 +57,7 @@ const route = useRoute()
     height: 100vh;
     background-color: $base-menu-backgound-color;
     color: white;
-    transition: all 0.5s;
+    transition: all 0.3s;
 
     &.fold {
       width: $base-menu-min-width;
@@ -79,7 +80,7 @@ const route = useRoute()
     height: $base-tabbar-height;
     left: $base-menu-width;
     top: 0px;
-    transition: all 0.5s;
+    transition: all 0.3s;
 
     &.fold {
       width: calc(100vw - $base-menu-min-width);
@@ -96,7 +97,7 @@ const route = useRoute()
     top: $base-tabbar-height;
     padding: 20px;
     overflow: auto; // 加滚动条，其样式写在index.scss文件中，作为全局样式
-    transition: all 0.5s;
+    transition: all 0.3s;
 
     &.fold {
       width: calc(100vw - $base-menu-min-width);
