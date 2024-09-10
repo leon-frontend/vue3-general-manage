@@ -5,6 +5,9 @@ import 'nprogress/nprogress.css' // 一定要引入进度条的样式
 import pinia from '@/store'
 import { useUserStore } from '@/store/modules'
 
+// 不展示右侧的旋转器
+nprogress.configure({ showSpinner: false })
+
 /**
  * 在组件以外的地方使用 Pinia 中的小仓库时，需要根据 Pinia 大仓库来创建小仓库
  * 使用 userStore 小仓库中的 token 来实现路由鉴权
@@ -26,7 +29,7 @@ const userStore = useUserStore(pinia)
  * @param from 指从哪个路由而来
  * @param next 指路由的放行函数
  */
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _, next) => {
   // 访问某一个路由页面时，动态切换标签页的标题
   document.title = '硅谷甄选 - ' + to.meta.title
 
@@ -68,7 +71,7 @@ router.beforeEach(async (to, from, next) => {
            * 1. 首先退出登录：清空用户的相关数据
            * 2. 将路由重定向至 Login 页面，并使用 query 参数携带想要访问的路由
            */
-          userLogout()
+          await userLogout()
           next({ path: '/login', query: { redirect: to.path } })
         }
       }
@@ -85,7 +88,7 @@ router.beforeEach(async (to, from, next) => {
 })
 
 // 1.2 全局后置守卫
-router.afterEach((to, from) => {
+router.afterEach(() => {
   // 在后置守卫中实现进度条"终止"
   nprogress.done()
 })

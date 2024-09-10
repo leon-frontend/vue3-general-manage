@@ -30,6 +30,7 @@ const route = useRoute()
           :default-active="route.path"
           :collapse="fold"
           :collapse-transition="false"
+          unique-opened
         >
           <!-- 根据路由信息动态生成菜单 -->
           <Menu :menuList="userStore.menuRoutes"></Menu>
@@ -92,7 +93,6 @@ const route = useRoute()
     position: absolute;
     width: calc(100% - $base-menu-width);
     height: calc(100vh - $base-tabbar-height);
-    background-color: red;
     left: $base-menu-width;
     top: $base-tabbar-height;
     padding: 20px;

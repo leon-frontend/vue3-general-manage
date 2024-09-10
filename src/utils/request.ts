@@ -5,7 +5,7 @@ import { useUserStore } from '@/store/modules'
 import { storeToRefs } from 'pinia'
 
 // 1. 利用create方法创建axios实例，create方法的好处是可以配置基础路径、超时时间等。
-let request = axios.create({
+const request = axios.create({
   // baseURL表示基础路径，VITE_APP_BASE_API = '/api'是开发环境的全局变量
   baseURL: import.meta.env.VITE_APP_BASE_API, // 基础路径上会携带/api
   timeout: 5000, // 超时时间

@@ -72,7 +72,7 @@ const handleLogin = async () => {
  */
 const validateUsername = (
   _: unknown,
-  value: any,
+  value: string,
   callback: (error?: Error) => void,
 ) => {
   if (value.length >= 5 && value.length <= 10) callback()
@@ -81,7 +81,7 @@ const validateUsername = (
 
 const validatePassword = (
   _: unknown,
-  value: any,
+  value: string,
   callback: (error?: Error) => void,
 ) => {
   if (value.length >= 6 && value.length <= 10) callback()

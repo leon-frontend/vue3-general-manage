@@ -45,9 +45,9 @@ const handleFullScreen = () => {
  * 2. 清空仓库当中与当前用户相关的数据和 LocalStorage 中的 token 信息。
  * 3. 跳转到登陆页面。
  */
-const handleLogout = () => {
+const handleLogout = async () => {
   // 调用 userStore 仓库中的 userLogout 方法，用于用户退出登录操作
-  userLogout()
+  await userLogout()
 
   // 跳转到登陆页面，并且携带"退出登录"时的路由路径（路由传参），当再次登录时直接重定向到"退出登陆"前的页面
   $router.push({ path: '/login', query: { redirect: $route.path } })

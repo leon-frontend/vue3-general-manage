@@ -1,32 +1,33 @@
-// 1.1 用户登录请求需要携带参数的ts类型
-export interface LoginForm {
+// 用户登录请求需要携带参数的ts类型
+export interface LoginFormData {
   username: string
   password: string
 }
-// 1.2 用户登录请求返回的数据类型
-interface DataType {
-  token?: string // token只会在用户登录成功时出现
-  message?: string // message只会在用户登录失败时出现
-}
-export interface LoginResponseData {
+
+// 定义全部接口返回数据的公共 TS 类型
+export interface ResponseData {
   code: number
-  data: DataType
+  message: string
+  ok: boolean
 }
 
-// 2. 定义服务器返回用户信息的数据类型
-export interface CheckUser {
-  userId: number
-  avatar: string
-  username: string
-  password: string
-  desc: string
-  roles: string[]
-  buttons: string[]
-  routes: string[]
-  token: string
+// 定义登录接口返回的数据类型
+export interface LoginResponseData extends ResponseData {
+  data: string
 }
 
-export interface UserResponseData {
-  code: number
-  data: { checkUser: CheckUser }
+// 定义退出登录接口返回的数据类型
+export interface LogoutResponseData extends ResponseData {
+  data: null
+}
+
+// 定义获取用户信息接口返回的数据类型
+export interface userInfoResponseData extends ResponseData {
+  data: {
+    routes: string[]
+    buttons: string[]
+    roles: string[]
+    name: string
+    avatar: string
+  }
 }

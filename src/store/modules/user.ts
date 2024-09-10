@@ -3,8 +3,13 @@ import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 import { SET_TOKEN, GET_TOKEN } from '@/utils/token'
 import { constantRoutes } from '@/router/routes'
-import type { LoginForm, LoginResponseData } from '@/api/user/type'
-import { reqLogin, reqUserInfo } from '@/api/user'
+import { reqLogin, reqUserInfo, reqLogout } from '@/api/user'
+import type {
+  LoginFormData,
+  LoginResponseData,
+  userInfoResponseData,
+  LogoutResponseData,
+} from '@/api/user/type'
 
 /**
  * 使用组合式 API 创建 userStore 仓库：
@@ -12,7 +17,7 @@ import { reqLogin, reqUserInfo } from '@/api/user'
  * 2. 定义的函数就是 actions 中的方法。
  */
 export const useUserStore = defineStore('User', () => {
-  //#region ---------- 1. token 和用户登录相关的业务处理 -------------
+  //#region ------------ 1. token 和用户登录相关的业务处理 ---------
   /**
    * token 是用户的唯一标识，并且实现localStorage的持久化。
    * localStorage.getItem('TOKEN') 的默认值是 null。
@@ -21,36 +26,48 @@ export const useUserStore = defineStore('User', () => {
   const token = ref<string | null>(GET_TOKEN())
 
   // userLogin 函数是用户登陆时调用的方法
-  const userLogin = async (data: LoginForm) => {
+  const userLogin = async (data: LoginFormData) => {
     const result: LoginResponseData = await reqLogin(data)
 
     // 登录成功，则返回成功的Promise，并处理token
     if (result.code === 200) {
       // 将登陆成功后的 token 存到 pinia 中
-      token.value = result.data.token as string
+      token.value = result.data as string
 
       // 将用户的token存在localStorage中实现持久化
-      SET_TOKEN(result.data.token as string)
+      SET_TOKEN(result.data as string)
 
       // 保证返回成功状态的Promise对象
       return 'ok'
     } else {
       // 请求失败，则返回失败的Promise，并且弹出失败信息
-      return Promise.reject(new Error(result.data.message))
+      return Promise.reject(new Error(result.data))
     }
   }
 
   // userLogout 函数是用户退出登录时调用的方法
-  const userLogout = () => {
-    // 清空仓库当中与当前用户想关的数据
-    token.value = ''
-    userName.value = ''
-    userAvatar.value = ''
+  const userLogout = async () => {
+    // 发送退出登录的请求
+    const result: LogoutResponseData = await reqLogout()
 
-    // 清空 localStorage 中的 token 信息
-    localStorage.removeItem('TOKEN')
+    // 当返回的状态是 200 时，表示退出登录成功
+    if (result.code === 200) {
+      // 清空仓库当中与当前用户想关的数据
+      token.value = ''
+      userName.value = ''
+      userAvatar.value = ''
+
+      // 清空 localStorage 中的 token 信息
+      localStorage.removeItem('TOKEN')
+
+      // 返回成功的 Promise ，表示退出成功
+      return 'ok'
+    } else {
+      // 退出登录失败，则返回失败的 Promise 对象
+      return Promise.reject(new Error(result.message))
+    }
   }
-  //#endregion --------- 1. token 和用户登录相关的业务处理 ---------------
+  //#endregion ---------- 1. token 和用户登录相关的业务处理 ---------------
 
   //#region ------------- 2. 用户信息相关的业务处理 ---------------
   // userName 响应式数据指用户姓名；userAvatar 响应式数据指用户头像
@@ -60,23 +77,23 @@ export const useUserStore = defineStore('User', () => {
   // useInfo 函数用于获取用户信息的方法
   const getUserInfo = async () => {
     // 获取用户信息（用户头像、姓名等信息）并存储在仓库当中
-    const result = await reqUserInfo()
+    const result: userInfoResponseData = await reqUserInfo()
 
     // 如果用户信息获取成功，则存储用户的姓名和头像信息
     if (result.code === 200) {
-      userName.value = result.data.checkUser.username
-      userAvatar.value = result.data.checkUser.avatar
+      userName.value = result.data.name
+      userAvatar.value = result.data.avatar
 
       // 获取用户信息成功，返回"成功"的 Promise 对象
       return 'ok'
     } else {
       // 请求失败，则返回失败的 Promise 对象
-      return Promise.reject('获取用户信息失败')
+      return Promise.reject(new Error(result.message))
     }
   }
   //#endregion ---------- 2. 用户信息相关的业务处理 -------------
 
-  //#region ------------ 3. 和路由相关的业务处理 ----------------
+  //#region ------------- 3. 和路由相关的业务处理 ----------------
   const menuRoutes = reactive(constantRoutes) // 常量路由数据
   //#endregion --------- 3. 和路由相关的业务处理 ----------------
 

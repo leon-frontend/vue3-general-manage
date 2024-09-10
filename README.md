@@ -1,3 +1,9 @@
+# 00. 项目简介
+
+- **服务器域名**：http://sph-api.atguigu.cn
+- **接口文档 1**：http://139.198.104.58:8212/swagger-ui.html#/
+- **接口文档 2**：http://39.98.123.211:8510/swagger-ui.html
+
 # 01. 路由切换 & 路由守卫
 
 ## 1.1 切换路由组件时，实现过渡动效
@@ -33,7 +39,7 @@
 
 - 使用 **nprogress 库**实现，该库是一个 JS 库，由于没有 TS 类型定义，所以还需要安装 **@types/nprogress 库**来给其提供 TS 类型，防止编译时报错。
 - 在引入该库时，**一定要引入其 CSS 样式文件**，并且可以在该样式文件中自定义样式。
--  **全局路由守卫**：任意路由切换都会触发的钩子。
+- **全局路由守卫**：任意路由切换都会触发的钩子。
 
 ```ts
 // 1. ----------------- 安装 nprogress 库和 @types/nprogress 库 -----------------
@@ -45,8 +51,10 @@ import router from '@/router'
 import nprogress from 'nprogress'
 import 'nprogress/nprogress.css' // 一定要引入进度条的样式
 
+nprogress.configure({ showSpinner: false }) // 不展示右侧的旋转器
+
 // 全局前置守卫：访问任意路由之前会触发的钩子。to 指将要访问的路由；from 指从哪个路由而来；next 指路由的放行函数
-router.beforeEach((to, from, next) => {  
+router.beforeEach((to, from, next) => {
   nprogress.start() // 在前置守卫中开启进度条
   next()
 })
@@ -63,15 +71,15 @@ router.afterEach((to, from) => { nprogress.done() })
 - **用户登录成功的情况**：用户登录成功之后，**不能访问 Login 页面**，会直接重定向至首页。其他路由组件正常访问。
 - **获取用户信息**：用户登陆成功后，访问除了 Login 以外的组件时，都需要获取"用户姓名和用户头像"信息**供顶部展示区域使用**。
   - 若用户信息存在，则直接放行；
-  - 若用户信息不存在（如刷新页面会清除仓库中的 token 数据），则**发送获取用户信息的请求**。
+  - 若用户信息不存在（如刷新页面会清除仓库中的用户信息数据），则**发送获取用户信息的请求**。
     - 当请求成功获取用户信息时，放行；
     - 若请求失败（如 token 失效），则首先需要退出登录，然后将路由重定向至 Login 页面。
 - 访问某一个路由页面时，**动态切换标签页的标题**。
 
 ```ts
 // 实现路由鉴权
-router.beforeEach(async (to, from, next) => {  
-  document.title = '硅谷甄选 - ' + to.meta.title // 访问某一个路由页面时，动态切换标签页的标题  
+router.beforeEach(async (to, from, next) => {
+  document.title = '硅谷甄选 - ' + to.meta.title // 访问某一个路由页面时，动态切换标签页的标题
   nprogress.start() // 在前置守卫中开启进度条
 
   // 从 userStore 小仓库中获取 token、用户姓名和用户头像
@@ -80,14 +88,15 @@ router.beforeEach(async (to, from, next) => {
   // token 若存在，则表示用户已登录；token 若不存在，则表示用户未登录
   if (token) {
     // 用户登录成功的情况
-    if (to.path === '/login')  next({ path: '/' })      
+    if (to.path === '/login') next({ path: '/' })
     else {
       // 若用户信息存在，则直接放行；若用户信息不存在，则发送获取用户信息的请求之后，再放行
-      if (userName) next() // 用户信息存在，直接放行
+      if (userName)
+        next() // 用户信息存在，直接放行
       else {
         // 用户信息不存在的情况
-        try {         
-          await getUserInfo() // 发请求获取用户信息          
+        try {
+          await getUserInfo() // 发请求获取用户信息
           next() // 获取用户信息成功之后，放行
         } catch (error) {
           // 发请求获取用户信息失败时（如 token 过期），会执行下面的代码
@@ -97,7 +106,7 @@ router.beforeEach(async (to, from, next) => {
       }
     }
   } else {
-	// 用户未登录的情况
+    // 用户未登录的情况
     if (to.path === '/login') next()
     else next({ path: '/login', query: { redirect: to.path } })
   }
@@ -142,7 +151,9 @@ const handleFullScreen = () => {
   let fullScreen = document.fullscreenElement
 
   // 全屏模式的切换
-  fullScreen ? document.exitFullscreen() : document.documentElement.requestFullscreen()
+  fullScreen
+    ? document.exitFullscreen()
+    : document.documentElement.requestFullscreen()
 }
 ```
 
@@ -161,8 +172,7 @@ $router.push({ path: '/login', query: { redirect: $route.path } })
  * 注：query 参数中的 rediect 的属性值保存了上次退出登陆时展示的页面
  */
 const redirect = $route.query.redirect
-redirect ? $router.push({ path: redirect as string }) : $router.push({ path: '/' })
+redirect
+  ? $router.push({ path: redirect as string })
+  : $router.push({ path: '/' })
 ```
-
-
-
