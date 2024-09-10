@@ -7,7 +7,7 @@ import type {
   LogoutResponseData,
 } from './type'
 
-// 定义和用户相关的 API
+// 定义和用户相关的 API 地址
 enum API {
   LOGIN_URL = '/admin/acl/index/login', // 用户登录
   LOGOUT_URL = '/admin/acl/index/logout', // 退出登录

@@ -157,7 +157,7 @@ const handleFullScreen = () => {
 }
 ```
 
-# 04. 用户登录
+# 04. 用户登录 & 退出登录
 
 - 用户退出登陆时，要记录当前展示的页面，当用户再次登录时，需要直接**重定向到用户退出登录前的页面**。可以使用**路由传参**实现。
 
@@ -167,7 +167,7 @@ $router.push({ path: '/login', query: { redirect: $route.path } })
 
 // ---------------------- Login.vue 组件 ----------------------
 /**
- * 请求成功则利用编程式路由导航跳转页面。
+ * 用户登录请求成功则利用编程式路由导航跳转页面。
  * 判断路由中是否存在 query 参数，若存在则跳转到 query 参数指定的路由
  * 注：query 参数中的 rediect 的属性值保存了上次退出登陆时展示的页面
  */
@@ -176,3 +176,56 @@ redirect
   ? $router.push({ path: redirect as string })
   : $router.push({ path: '/' })
 ```
+
+# 05. 商品管理页面
+
+## 5.1 品牌管理页面 & 分页器
+
+- 分页器的 **layout** 属性中的 **`->`** 符号表示将 sizes, total 两个组件在页面中的布局是**向右对齐**。
+- **分页器相关的请求**：**`/admin/product/baseTrademark/{page}/{limit}`** 根据**当前页**和**每页展示的数据数量**来获取当前页展示的数据。
+- **事件处理 1**：**`@current-change`** 事件会在 `current-page` 改变时触发，**并且向回调函数的形参注入更新后的 current-page 的值**。当其发生变化时，就需要**重新发送请求**，获取对应分页展示的数据的。
+  - 对于 **`@current-change`** 事件，由于该回调函数只需要重新发送请求获取数据，所以可直接将 getHasTradeMark 函数作为其回调函数。
+- **事件处理 2**：**`@size-change`** 事件会在 `page-size` 改变时触发，**并且向回调函数的形参注入更新后的 page-size 的值**。
+  - 对于 **`@size-change`** 事件，由于在其回调函数中**存在多个业务逻辑**，所以需要专门为其定义一个回调函数。
+  - 额外的业务逻辑：当页面展示的数据数量发生变化时，**将"当前页"设置为第一页**。
+- **注意**：尽管 `pageNo.value = 1` 的更新是异步的，但 Vue 的响应式系统保证了在任何事件回调（比如 `handlePageSizeChange`）或生命周期钩子（比如 `onMounted`）被触发前，**相关的响应式数据已经完成更新**。
+
+```vue
+<script setup lang="ts" name="TradeMark">
+const pageNo = ref<number>(1) // 当前页码
+const pageSize = ref<number>(3) // 每页展示多少条数据
+
+// 将获取已有品牌数据的方法封装成 getHasTradeMark 函数
+const getHasTradeMark = async () => {  
+  const result = await reqHasTradeMark(pageNo.value, pageSize.value) // 发送获取已有品牌数据请求
+
+  // 当返回的状态码为 200 时，表示请求响应成功
+  if (result.code === 200) {   
+    total.value = result.data.total // 更新表格展示数据的总数    
+    tradeMarkData.value = result.data.records // 更新已有品牌的数据
+  }
+}
+
+// 当页面展示的数据数量发生变化时，会触发 handlePageSizeChange 回调函数
+const handlePageSizeChange = () => {
+  // 当页面展示的数据数量发生变化时，首先将"当前页"设置为第一页。
+  // 当 pageNo.value 的值更新为 1 后，Vue 会在后续的事件处理函数代码执行之前完成这次更新。
+  // 即 Vue 确保在事件处理函数执行之前，所有相关的响应式数据已经被更新到最新状态。
+  pageNo.value = 1
+
+  // 重新发送请求获取数据（使用更新后的 pageNo 的值）
+  getHasTradeMark()
+}
+</script>
+
+<!-- 分页器组件： -->
+<el-pagination
+  v-model:current-page="pageNo"
+  v-model:page-size="pageSize"
+  :page-sizes="[3, 5, 7, 9]"
+  layout="prev, pager, next, jumper, ->, sizes, total"
+  :total="400"
+  @current-change="getHasTradeMark"
+/>
+```
+
