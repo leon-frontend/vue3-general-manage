@@ -188,7 +188,7 @@ redirect
 - **事件处理 2**：**`@size-change`** 事件会在 `page-size` 改变时触发，**并且向回调函数的形参注入更新后的 page-size 的值**。
   - 对于 **`@size-change`** 事件，由于在其回调函数中**存在多个业务逻辑**，所以需要专门为其定义一个回调函数。
   - 额外的业务逻辑：当页面展示的数据数量发生变化时，**将"当前页"设置为第一页**。
-- **注意**：尽管 `pageNo.value = 1` 的更新是异步的，但 Vue 的响应式系统保证了在任何事件回调（比如 `handlePageSizeChange`）或生命周期钩子（比如 `onMounted`）被触发前，**相关的响应式数据已经完成更新**。
+- **注意**：尽管 `pageNo.value = 1` 的**更新是异步**的，但 Vue 的响应式系统保证了在任何事件回调（比如 `handlePageSizeChange`）或生命周期钩子（比如 `onMounted`）被触发前，**相关的响应式数据已经完成更新**。
 
 ```vue
 <script setup lang="ts" name="TradeMark">
@@ -196,12 +196,12 @@ const pageNo = ref<number>(1) // 当前页码
 const pageSize = ref<number>(3) // 每页展示多少条数据
 
 // 将获取已有品牌数据的方法封装成 getHasTradeMark 函数
-const getHasTradeMark = async () => {  
+const getHasTradeMark = async () => {
   const result = await reqHasTradeMark(pageNo.value, pageSize.value) // 发送获取已有品牌数据请求
 
   // 当返回的状态码为 200 时，表示请求响应成功
-  if (result.code === 200) {   
-    total.value = result.data.total // 更新表格展示数据的总数    
+  if (result.code === 200) {
+    total.value = result.data.total // 更新表格展示数据的总数
     tradeMarkData.value = result.data.records // 更新已有品牌的数据
   }
 }
@@ -226,6 +226,6 @@ const handlePageSizeChange = () => {
   layout="prev, pager, next, jumper, ->, sizes, total"
   :total="400"
   @current-change="getHasTradeMark"
+  @size-change="handlePageSizeChange"
 />
 ```
-

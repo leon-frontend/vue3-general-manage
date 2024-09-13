@@ -19,6 +19,7 @@ request.interceptors.request.use((config) => {
 
   // config 对象中的 headers 属性表示请求头，常用于携带公共参数（比如携带 token）
   if (token.value) config.headers.token = token.value
+
   return config // 必须返回配置对象
 })
 
@@ -28,28 +29,7 @@ request.interceptors.response.use(
   (response) => response.data,
   // 响应失败时，处理错误
   (error) => {
-    // 处理网络错误
-    let msg = ''
-    let status = error.response.status
-
-    switch (status) {
-      case 401:
-        msg = 'token过期'
-        break
-      case 403:
-        msg = '无权访问'
-        break
-      case 404:
-        msg = '请求地址错误'
-        break
-      case 500:
-        msg = '服务器出现问题'
-        break
-      default:
-        msg = '无网络'
-    }
-
-    ElMessage({ type: 'error', message: msg })
+    ElMessage.error(error.message)
     return Promise.reject(error)
   },
 )

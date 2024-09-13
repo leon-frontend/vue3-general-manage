@@ -7,12 +7,12 @@
 }
 
 ::-webkit-scrollbar-track {
-  background-color: $base-menu-backgound-color; // 滚动条的颜色
+  background-color: #e7e3e3; // 滚动条的背景颜色
 }
 
 ::-webkit-scrollbar-thumb {
   width: 10px;
-  background-color: yellow; // 滚动滑块的颜色
+  background-color: $base-menu-backgound-color; // 滚动滑块的颜色
   border-radius: 10px;
 }
 
