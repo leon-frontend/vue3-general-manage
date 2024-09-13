@@ -1,5 +1,6 @@
 <!-- 递归组件必须设置 name 属性 -->
 <script setup lang="ts" name="Menu">
+//
 import { useRouter } from 'vue-router'
 
 // 通过 useRouter hook 获取 router, 实现编程式路由导航
