@@ -7,17 +7,24 @@ import { ElMessage } from 'element-plus'
 type Props = {
   allAttrData: SingleAttrData[]
   attrParams: SingleAttrData
-  updateIsShowTable: (isShow: boolean) => boolean
   getAllAttrData: () => Promise<void>
+}
+
+// 定义父组件给子组件绑定的自定义事件函数的回调函数的形参类型
+type EmitEvents = {
+  'change-scene': [sceneStr: 'AttrTable' | 'AddOrUpdateAttr']
 }
 
 // 使用 defineProps 接收父组件传递过来的数据
 const props = defineProps<Props>()
 
+// 使用 defineEmits 获取父组件给子组件绑定的自定义事件
+const $emit = defineEmits<EmitEvents>()
+
 // handleEditBtn 函数会在点击表格中的"编辑"按钮时触发
 const handleEditBtn = (rowAttrData: SingleAttrData) => {
-  // 隐藏表格，显示"新增数据"的 HTML 结构
-  props.updateIsShowTable(false)
+  // 切换为显示""新增数据"的 HTML 结构"的场景
+  $emit('change-scene', 'AddOrUpdateAttr')
 
   // 将当前行的属性数据赋值给 attrParams 对象，实现编辑时数据回显
   // 若使用浅拷贝，则编辑的数据和展示的数据是同一个引用地址，修改数据后，若点击取消按钮，则表格展示的数据是修改后的数据

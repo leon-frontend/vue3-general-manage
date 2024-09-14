@@ -7,11 +7,20 @@ import { storeToRefs } from 'pinia'
 import { reqAttrData } from '@/api/product/attr'
 import type { AttrResponseData, SingleAttrData } from '@/api/product/attr/type'
 
-// isShowTable 响应式数据用于控制表格的显示与隐藏
-const isShowTable = ref<boolean>(true)
+// 定义 sceneShift 数据(场景切换)的 TS 类型
+export type SceneShiftType = 'AttrTable' | 'AddOrUpdateAttr'
 
-// updateIsShowTable 方法用于更新 isShowTable 的值，该方法给子组件使用
-const updateIsShowTable = (isShow: boolean) => (isShowTable.value = isShow)
+/**
+ * sceneShift 响应式数据用于控制"场景"切换：
+ *    1. 值为 AttrTable 时，表示展示表格界面
+ *    2. 值为 AddOrUpdateAttr 时，表示展示"新增"和"编辑"属性时的界面
+ */
+const sceneShift = ref<SceneShiftType>('AttrTable')
+
+// updateSceneShift 方法用于更新 sceneShift 的值，该方法给子组件使用
+const changeScene = (sceneStr: SceneShiftType) => {
+  sceneShift.value = sceneStr
+}
 
 //#region ------------------- 表格"数据展示"的相关业务逻辑 ---------------------
 // 引入 categoryStore 小仓库，使用和"分类"相关的共享数据，并进行响应式解构
@@ -50,8 +59,8 @@ watch(thirdCategoryId, (newValue) => {
   // "三级分类"的 id 发生变化后，清空表格展示的数据
   allAttrData.value = []
 
-  // 调用 getAllAttrData 函数发送请求，获取所有的"属性名和属性值"数据
-  // thirdCategoryId 的值可能为 ''，因为进行条件判断
+  // 调用 getAllAttrData 函数发送请求，获取"某个三级分类"下所有的"属性名和属性值"数据
+  // thirdCategoryId 的值可能为 ''，因此进行条件判断，值为非空时才发送请求
   newValue && getAllAttrData()
 })
 //#endregion ---------------- 表格"数据展示"的相关业务逻辑 -------------------
@@ -66,8 +75,8 @@ const handleAddBtn = () => {
     categoryLevel: 3, // 所属分类的等级
   })
 
-  // 隐藏表格，显示"新增数据"的 HTML 结构
-  isShowTable.value = false
+  // 切换为显示""新增"和"编辑"属性时的界面"的场景
+  sceneShift.value = 'AddOrUpdateAttr'
 }
 
 //#region ----------------- "添加属性"和"修改属性"相关的业务逻辑 ------------------
@@ -84,12 +93,12 @@ const attrParams = reactive<SingleAttrData>({
 <template>
   <div>
     <!-- 上方"选择分类"的三个选择框，Category 可以直接使用，因为进行了全局注册 -->
-    <Category :isShowTable="isShowTable" />
+    <Category :sceneShift="sceneShift" />
 
     <!-- 下方展示区域 -->
     <el-card style="margin-top: 20px">
       <!-- 表格展示数据的 HTML 代码 -->
-      <div v-show="isShowTable">
+      <div v-show="sceneShift === 'AttrTable'">
         <el-button
           type="primary"
           icon="Plus"
@@ -98,21 +107,22 @@ const attrParams = reactive<SingleAttrData>({
         >
           添加属性
         </el-button>
+
         <!-- 表格组件 -->
         <AttrTable
           :allAttrData="allAttrData"
           :attrParams="attrParams"
-          :updateIsShowTable="updateIsShowTable"
           :getAllAttrData="getAllAttrData"
+          @change-scene="changeScene"
         />
       </div>
 
       <!-- "添加属性"和"修改属性"的 HTML 代码 -->
-      <div v-show="!isShowTable">
+      <div v-show="sceneShift === 'AddOrUpdateAttr'">
         <AddOrUpdateAttr
           :attrParams="attrParams"
-          :updateIsShowTable="updateIsShowTable"
           :getAllAttrData="getAllAttrData"
+          @change-scene="changeScene"
         />
       </div>
     </el-card>

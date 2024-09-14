@@ -2,10 +2,12 @@
 import { onMounted } from 'vue'
 import { useCategoryStore } from '@/store/modules'
 import { storeToRefs } from 'pinia'
+import type { SceneShiftType as AttrSceneType } from '@/views/Product/Attr/index.vue'
+import type { SceneShiftType as SpuSceneType } from '@/views/Product/SPU/index.vue'
 
 // 定义父组件传递过来的值的 TS 类型
 type Props = {
-  isShowTable: boolean
+  sceneShift: AttrSceneType | SpuSceneType
 }
 
 // 使用 defineProps 接收父组件传递过来的值
@@ -63,7 +65,7 @@ const changeCategoryItem = (categoryLevel: 1 | 2) => {
       <el-form-item label="一级分类：">
         <!-- 当页面展示的是"添加属性"和"修改属性"的 HTML 结构时，禁用选择框 -->
         <el-select
-          :disabled="!isShowTable"
+          :disabled="sceneShift !== 'AttrTable' && sceneShift !== 'SpuTable'"
           v-model="fisrtCategoryId"
           @change="changeCategoryItem(1)"
         >
@@ -79,7 +81,7 @@ const changeCategoryItem = (categoryLevel: 1 | 2) => {
       <!-- 二级分类 -->
       <el-form-item label="二级分类：">
         <el-select
-          :disabled="!isShowTable"
+          :disabled="sceneShift !== 'AttrTable' && sceneShift !== 'SpuTable'"
           v-model="secondCategoryId"
           @change="changeCategoryItem(2)"
         >
@@ -94,7 +96,10 @@ const changeCategoryItem = (categoryLevel: 1 | 2) => {
       </el-form-item>
       <!-- 三级分类 -->
       <el-form-item label="三级分类：">
-        <el-select :disabled="!isShowTable" v-model="thirdCategoryId">
+        <el-select
+          :disabled="sceneShift !== 'AttrTable' && sceneShift !== 'SpuTable'"
+          v-model="thirdCategoryId"
+        >
           <el-option
             v-for="thirdCategory in allThirdCategory"
             :key="thirdCategory.id"

@@ -7,20 +7,28 @@ import type { SingleAttrData, SingleAttrValue } from '@/api/product/attr/type'
 // 定义父组件传递过来的数据的 TS 类型
 type Props = {
   attrParams: SingleAttrData // attrParams 用于收集"添加属性"或"修改属性"的新数据
-  updateIsShowTable: (isShow: boolean) => boolean // 控制表格是否展示
   getAllAttrData: () => Promise<void> // 获取所有的属性数据
+}
+
+// 定义父组件给子组件绑定的自定义事件函数的回调函数的形参类型
+type EmitEvents = {
+  'change-scene': [sceneStr: 'AttrTable' | 'AddOrUpdateAttr']
 }
 
 // 使用 defineProps 接收父组件传递过来的数据
 const props = defineProps<Props>()
+
+// 使用 defineEmits 获取父组件给子组件绑定的自定义事件
+const $emit = defineEmits<EmitEvents>()
 
 // inputRefs 用于保存多个 el-input 组件实例，用于输入框自动聚焦
 const inputRefs = ref<HTMLInputElement[]>([])
 
 // handleCancelBtn 函数会在点击"取消"按钮时触发
 const handleCancelBtn = () => {
-  // 隐藏"新增数据"的 HTML 结构，显示表格
-  props.updateIsShowTable(true)
+  // 切换为场景 1，即隐藏"新增数据"的 HTML 结构，显示
+  // 切换为显示"表格数据"的场景
+  $emit('change-scene', 'AttrTable')
 }
 
 // handleAddAttrBtn 函数会在点击"添加新属性值"按钮时触发
@@ -82,7 +90,7 @@ const handleSaveBtn = async () => {
     ElMessage.success(props.attrParams.id ? '属性修改成功' : '属性添加成功')
 
     // 请求响应成功后，跳转到"表格"页面，并重新获取更新后的属性数据
-    props.updateIsShowTable(true)
+    $emit('change-scene', 'AttrTable')
     props.getAllAttrData()
   } catch (error) {
     // 请求响应失败后，弹出提示信息
@@ -94,7 +102,7 @@ const handleSaveBtn = async () => {
 
 <template>
   <el-form inline>
-    <el-form-item label="新属性名称：">
+    <el-form-item label="属性名称：">
       <el-input
         v-model="attrParams.attrName"
         placeholder="请输入新属性名称"

@@ -1,5 +1,4 @@
 <script setup lang="ts" name="Logo">
-//
 import setting from '@/setting'
 </script>
 

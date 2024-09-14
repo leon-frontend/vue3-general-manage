@@ -77,12 +77,7 @@ const handleDelete = async (id: number, tmName: string) => {
     <el-table-column label="品牌操作" align="center">
       <template #default="{ row }">
         <el-space size="large">
-          <el-button
-            type="warning"
-            size="default"
-            icon="Edit"
-            @click="handleEdit(row)"
-          >
+          <el-button type="warning" icon="Edit" @click="handleEdit(row)">
             编辑
           </el-button>
           <el-popconfirm
@@ -94,9 +89,7 @@ const handleDelete = async (id: number, tmName: string) => {
             @confirm="handleDelete(row.id, row.tmName)"
           >
             <template #reference>
-              <el-button type="danger" size="default" icon="Delete">
-                删除
-              </el-button>
+              <el-button type="danger" icon="Delete">删除</el-button>
             </template>
           </el-popconfirm>
         </el-space>

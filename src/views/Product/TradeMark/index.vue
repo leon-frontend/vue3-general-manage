@@ -32,6 +32,9 @@ const getHasTradeMark = async () => {
   }
 }
 
+// 在 onMounted 生命周期钩子中调用 getHasTradeMark 函数，获取已有品牌数据
+onMounted(() => getHasTradeMark())
+
 // 当"页面展示的数据数量"发生变化时，会触发 handlePageSizeChange 回调函数
 const handlePageSizeChange = () => {
   // 当页面展示的数据数量发生变化时，首先将"当前页"设置为第一页。
@@ -42,10 +45,6 @@ const handlePageSizeChange = () => {
   // 重新发送请求获取数据（使用更新后的 pageNo 的值）
   getHasTradeMark()
 }
-
-// 在 onMounted 生命周期钩子中调用 getHasTradeMark 函数，获取已有品牌数据
-onMounted(() => getHasTradeMark())
-
 //#endregion --------------- "表格"和"分页器"相关的业务逻辑 ---------------------
 
 //#region ----------------- Modal 弹框相关的业务逻辑 --------------------
