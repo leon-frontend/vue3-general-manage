@@ -19,9 +19,7 @@ export type SceneShiftType = 'SpuTable' | 'AddOrUpdateSpu' | 'ViewSkuList'
 const sceneShift = ref<SceneShiftType>('SpuTable')
 
 // changeScene 方法用于更新 sceneShift 的值，该方法给子组件使用
-const changeScene = (sceneStr: SceneShiftType) => {
-  sceneShift.value = sceneStr
-}
+const changeScene = (sceneStr: SceneShiftType) => (sceneShift.value = sceneStr)
 
 //#region -------------------- "分页器"相关的业务逻辑 ----------------------
 const pageNo = ref<number>(1) // pageNo 响应式数据表示当前展示页码数
@@ -78,7 +76,7 @@ watch(thirdCategoryId, (newValue) => {
 //#endregion -------- -------- "表格数据展示"相关的业务逻辑 ----------------------
 
 //#region ------------------ "表格操作"相关的业务逻辑 ----------------------
-// AddOrUpdateSpuRef 用于获取
+// AddOrUpdateSpuRef 用于获取 AddOrUpdateSpu 组件实例
 const AddOrUpdateSpuRef = ref<InstanceType<typeof AddOrUpdateSpu> | null>(null)
 
 // handleAddSpuBtn 函数会在点击 "新增 SPU" 按钮时触发

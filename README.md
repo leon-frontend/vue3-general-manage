@@ -236,7 +236,7 @@ const handlePageSizeChange = () => {
 
 - 点击**"表格"场景**下的表格中的**某一行的"编辑 SPU"按钮**会跳转到**"添加或更新 SPU"的场景**，此时需要将这一行的 SPU 数据**拷贝**给 AddOrUpdateSpu 组件中的 **completeSpuParams** 响应式数据。
   - **必须使用 深拷贝 实现这个拷贝过程**：若使用浅拷贝，则编辑的数据和展示的数据是**同一个引用地址**，修改数据后，若点击取消按钮，则表格展示的数据是修改后的数据。
-  -  **completeSpuParams 响应式数据**：用于保存"完整的 SPU"数据（由表格中的一行数据和其他数据拼接而成），并作为 **reqAddOrUpdateSpu 请求**的参数。
+  - **completeSpuParams 响应式数据**：用于保存"完整的 SPU"数据（由表格中的一行数据和其他数据拼接而成），并作为 **reqAddOrUpdateSpu 请求**的参数。
 
 ## 6.2 "添加或更新 SPU" 的场景
 
@@ -249,6 +249,8 @@ const allUploadImgs = ref<UploadUserFile[]>([]) // 存储所有格式化后的"�
 const imgsRes = await reqSpuImgs(rowSpuData.id as number) // 发送请求，获取某个 SPU 下的所有"商品图片"
 
 // 处理请求返回的图片数据，让其符合 Upload 组件中的图片数据格式
-allUploadImgs.value = imgsRes.data.map((item) => ({ name: item.imgName, url: item.imgUrl }))
+allUploadImgs.value = imgsRes.data.map((item) => ({
+  name: item.imgName,
+  url: item.imgUrl,
+}))
 ```
-

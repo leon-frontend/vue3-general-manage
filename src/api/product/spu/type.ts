@@ -80,7 +80,7 @@ export type SingleSaleAttrValue = {
 export type SingleSaleAttr = {
   id?: number // 新增属性值是不用带 id 数据
   spuId?: number
-  baseSaleAttrId: number
+  baseSaleAttrId: number | string
   saleAttrName: string
   spuSaleAttrValueList: SingleSaleAttrValue[]
 }

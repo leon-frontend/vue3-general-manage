@@ -1,12 +1,13 @@
 <script setup lang="ts" name="AddOrUpdateSpu">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { ElMessage } from 'element-plus'
 import {
-  reqSpuBrands,
   reqSpuImgs,
+  reqSpuBrands,
   reqSpuSaleAttrs,
   reqSpuSaleAttrNames,
 } from '@/api/product/spu'
-import type { UploadUserFile, UploadFile } from 'element-plus'
+import type { UploadUserFile, UploadFile, UploadProps } from 'element-plus'
 import type {
   SingleSpuData,
   SingleSpuBrand,
@@ -22,11 +23,8 @@ type EmitEvents = {
 // 使用 defineEmits 获取父组件给子组件绑定的自定义事件
 const $emit = defineEmits<EmitEvents>()
 
-// 点击"取消"按钮时会触发该函数
-const handleCancelBtn = () => {
-  // 切换为"展示表格界面"的场景
-  $emit('change-scene', 'SpuTable')
-}
+// 点击"取消"按钮时会触发该函数，切换为"展示表格界面"的场景
+const handleCancelBtn = () => $emit('change-scene', 'SpuTable')
 
 // completeSpuParams 用于保存"完整的 SPU"数据，并作为 reqAddOrUpdateSpu 请求的参数
 // "完整的 SPU"数据：由表格中的一行数据和其他数据拼接而成
@@ -42,7 +40,7 @@ const completeSpuParams = ref<SingleSpuData>({
 //#region ----------------- 实现"编辑"操作的数据回显 --------------------
 const allBransData = ref<SingleSpuBrand[]>([]) // 用于存储所有"品牌"数据
 const allUploadImgs = ref<UploadUserFile[]>([]) // 存储所有格式化后的"图片"数据，用于 Upload 组件
-const allSaleAttrs = ref<SingleSaleAttr[]>([]) // 用于存储所有"销售属性"数据
+const allSaleAttrs = ref<SingleSaleAttr[]>([]) // 用于存储所有已有的"销售属性"数据
 const allSaleAttrNames = ref<SingleSaleAttrName[]>([]) // 用于存储所有"销售属性的属性名"数据
 
 /**
@@ -80,12 +78,13 @@ const editSpuDataRecall = async (rowSpuData: SingleSpuData) => {
 defineExpose({ editSpuDataRecall })
 //#endregion -------------- 实现"编辑"操作的数据回显 --------------------
 
-//#region ----------------- "图片预览"相关的业务逻辑 --------------------
+//#region ----------------- "图片预览和上传"相关的业务逻辑 --------------------
 // picDialogShow 响应式数据用于控制"图片预览"的模态框的显示与隐藏
 const picDialogShow = ref<boolean>(false)
 
 // dialogImgUrl 用于控制"图片预览"模态框中展示的图片
 const dialogImgUrl = ref<string>('')
+
 /**
  * handlePicPreview 函数会在点击"照片墙"中的"预览"按钮时触发
  * @param imgFile on-preview 方法会向其回调函数注入一个参数，表示一个图片文件信息
@@ -97,7 +96,67 @@ const handlePicPreview = (imgFile: UploadFile) => {
   // 使用 imgFile 数据中的图片地址更新 dialogImgUrl 数据，从而实现模态框的图片展示
   dialogImgUrl.value = imgFile.url as string
 }
-//#endregion -------------- "图片预览"相关的业务逻辑 --------------------
+
+// hanleBeforeUpload 函数会在图片上传之前被触发，可以用于限定上传文件的类型和大小
+const hanleBeforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  // 限定上传文件的类型只能为图片类型，限定文件大小不能大于 4MB
+  if (
+    rawFile.type !== 'image/png' &&
+    rawFile.type !== 'image/jpeg' &&
+    rawFile.type !== 'image/gif'
+  ) {
+    ElMessage.error('文件上传类型必须是 PNG|JPG|GIF 格式!')
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 4) {
+    ElMessage.error('图片文件不能超过 4MB!')
+    return false
+  }
+
+  return true
+}
+//#endregion -------------- "图片预览和上传"相关的业务逻辑 --------------------
+
+//#region ------------------- "销售属性"相关的业务逻辑 ----------------------
+// unselectedSaleAttrNames 表示当前 SPU 未选择的销售属性名称
+const unselectedSaleAttrNames = computed(() => {
+  // 从所有"销售属性的属性名"数据中，找出还"没有使用的销售属性名称"
+  return allSaleAttrNames.value.filter((attrName) =>
+    allSaleAttrs.value.every(
+      (selectedAttr) => attrName.name !== selectedAttr.saleAttrName,
+    ),
+  )
+})
+
+// collectUnselectedSaleAttr 用于"选择框"收集"未选择"的销售属性 id 和属性名称
+// collectUnselectedSaleAttr 的格式为 "id: name"
+const collectUnselectedSaleAttr = ref<string>('')
+
+// addSaleAttrBtn 函数会在点击 "添加销售属性" 按钮时触发
+const addSaleAttrBtn = () => {
+  /**
+   * "添加销售属性" 按钮时，添加新的销售属性，必须要有如下字段
+   * baseSaleAttrId: number
+   * saleAttrName: string
+   * spuSaleAttrValueList: SingleSaleAttrValue[]
+   */
+  // 使用 split 方法将 collectUnselectedSaleAttr 中的字符串通过 : 切割成"销售属性 id 和属性名称"
+  const [baseSaleAttrId, saleAttrName] =
+    collectUnselectedSaleAttr.value.split(':')
+
+  // 准备一个"新的销售属性对象"，作为"请求的参数"将其带给服务器
+  const addNewSaleAttr: SingleSaleAttr = {
+    baseSaleAttrId,
+    saleAttrName,
+    spuSaleAttrValueList: [],
+  }
+
+  // 将 addNewSaleAttr "新的销售属性"追加到 allSaleAttrs 数组中
+  allSaleAttrs.value.push(addNewSaleAttr)
+
+  // 清空 collectUnselectedSaleAttr 的值，即 Select 选择框展示的数据
+  collectUnselectedSaleAttr.value = ''
+}
+//#endregion ---------------- "销售属性"相关的业务逻辑 ----------------------
 </script>
 
 <template>
@@ -136,7 +195,7 @@ const handlePicPreview = (imgFile: UploadFile) => {
         action="/api/admin/product/fileUpload"
         list-type="picture-card"
         :on-preview="handlePicPreview"
-        :on-remove="handleRemove"
+        :before-upload="hanleBeforeUpload"
       >
         <el-icon><Plus /></el-icon>
       </el-upload>
@@ -153,21 +212,62 @@ const handlePicPreview = (imgFile: UploadFile) => {
     <el-form-item label="SPU 销售属性：">
       <!-- 展示"销售属性"的下拉菜单 -->
       <el-select
-        placeholder="请选择 SPU 销售属性"
+        v-model="collectUnselectedSaleAttr"
+        :placeholder="
+          unselectedSaleAttrNames.length
+            ? `未选择 ${unselectedSaleAttrNames.length} 个销售属性`
+            : '无'
+        "
         style="width: 240px; margin-right: 20px"
       >
-        <el-option label="华为" />
-        <el-option label="oppo" />
-        <el-option label="vivo" />
+        <el-option
+          v-for="item in unselectedSaleAttrNames"
+          :key="item.id"
+          :label="item.name"
+          :value="`${item.id}:${item.name}`"
+        />
       </el-select>
       <!-- "添加销售属性"的按钮 -->
-      <el-button type="primary" icon="Plus">添加销售属性</el-button>
+      <el-button
+        :disabled="!collectUnselectedSaleAttr"
+        type="primary"
+        icon="Plus"
+        @click="addSaleAttrBtn"
+      >
+        添加销售属性
+      </el-button>
       <!-- 展示销售属性和属性值的表格 -->
-      <el-table border style="margin-top: 13px">
+      <el-table :data="allSaleAttrs" border style="margin-top: 13px">
         <el-table-column label="序号" type="index" width="80" align="center" />
-        <el-table-column label="属性名" width="150" />
-        <el-table-column label="属性值" />
-        <el-table-column label="操作" />
+        <el-table-column label="销售属性名" width="150" prop="saleAttrName" />
+        <el-table-column label="销售属性值">
+          <template #default="{ row }">
+            <el-tag
+              v-for="item in row.spuSaleAttrValueList"
+              :key="item.id"
+              closable
+              style="margin-right: 10px"
+            >
+              {{ item.saleAttrValueName }}
+            </el-tag>
+            <el-button type="success" icon="Plus" size="small" />
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="170" align="center">
+          <template #default="{ row, $index }">
+            <el-popconfirm
+              width="220"
+              icon="DeleteFilled"
+              icon-color="#F56C6C"
+              :title="`你确定要删除 &quot;${row.saleAttrName}&quot; 销售属性吗？`"
+              @confirm="allSaleAttrs.splice($index, 1)"
+            >
+              <template #reference>
+                <el-button type="danger" icon="Delete">删除</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
       </el-table>
     </el-form-item>
     <el-form-item>
