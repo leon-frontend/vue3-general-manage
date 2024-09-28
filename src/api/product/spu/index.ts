@@ -50,13 +50,13 @@ export const reqSpuSaleAttrNames = () =>
 // "新增"或"编辑" SPU 数据的接口
 export const reqAddOrUpdateSpu = (completeSpuData: SingleSpuData) => {
   // 如果 newSpuData 数据中存在 id 信息，则发送"更新 SPU 数据"的请求；反之，发送"新增 SPU 数据"的请求
-  completeSpuData.id
+  return completeSpuData.id
     ? request.post<SingleSpuData, ResponseNullData>(
-        API.ADD_SPU_URL,
+        API.UPDATE_SPU_URL,
         completeSpuData,
       )
     : request.post<SingleSpuData, ResponseNullData>(
-        API.UPDATE_SPU_URL,
+        API.ADD_SPU_URL,
         completeSpuData,
       )
 }

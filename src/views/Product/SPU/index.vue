@@ -1,5 +1,5 @@
 <script setup lang="ts" name="SPU">
-import { ref, watch } from 'vue'
+import { onBeforeUnmount, ref, watch } from 'vue'
 import AddOrUpdateSpu from './components/AddOrUpdateSpu.vue'
 import ViewSkuList from './components/ViewSkuList.vue'
 import { reqSpuData } from '@/api/product/spu'
@@ -7,6 +7,7 @@ import { useCategoryStore } from '@/store/modules'
 import { storeToRefs } from 'pinia'
 import type { SingleSpuData, GetSpuResponseData } from '@/api/product/spu/type'
 
+//#region ------------------------ "场景切换"相关业务逻辑 ----------------------
 // 定义 sceneShift 数据(场景切换)的 TS 类型
 export type SceneShiftType = 'SpuTable' | 'AddOrUpdateSpu' | 'ViewSkuList'
 
@@ -19,7 +20,19 @@ export type SceneShiftType = 'SpuTable' | 'AddOrUpdateSpu' | 'ViewSkuList'
 const sceneShift = ref<SceneShiftType>('SpuTable')
 
 // changeScene 方法用于更新 sceneShift 的值，该方法给子组件使用
-const changeScene = (sceneStr: SceneShiftType) => (sceneShift.value = sceneStr)
+const changeScene = (
+  sceneStr: SceneShiftType,
+  addOrUpdate: 'Add' | 'Update',
+) => {
+  // 切换场景
+  sceneShift.value = sceneStr
+
+  // 当切换场景是"表格界面"时，重新获取 SPU 数据。
+  // 如果是"编辑"操作返回"表格界面"，则要显示离开"表格界面"时的数据；"新增"操作展示第一页的数据
+  sceneStr === 'SpuTable' &&
+    (addOrUpdate === 'Update' ? getAllSpuData(pageNo.value) : getAllSpuData())
+}
+//#endregion --------------------- "场景切换"相关业务逻辑 ----------------------
 
 //#region -------------------- "分页器"相关的业务逻辑 ----------------------
 const pageNo = ref<number>(1) // pageNo 响应式数据表示当前展示页码数
@@ -79,21 +92,33 @@ watch(thirdCategoryId, (newValue) => {
 // AddOrUpdateSpuRef 用于获取 AddOrUpdateSpu 组件实例
 const AddOrUpdateSpuRef = ref<InstanceType<typeof AddOrUpdateSpu> | null>(null)
 
-// handleAddSpuBtn 函数会在点击 "新增 SPU" 按钮时触发
-const handleAddSpuBtn = () => {
+// addSpuBtn 函数会在点击 "新增 SPU" 按钮时触发
+const addSpuBtn = () => {
   // 切换为"展示"新增"和"编辑" SPU 时的界面"的场景
   sceneShift.value = 'AddOrUpdateSpu'
+
+  // 子组件的 addSpuInitData 方法用于实现 AddOrUpdateSpu 组件中的"新增"数据初始化
+  AddOrUpdateSpuRef.value?.addSpuInitData(thirdCategoryId.value)
 }
 
-// handleEditSpuBtn 函数会在点击"编辑 SPU"按钮时触发
-const handleEditSpuBtn = (rowSpuData: SingleSpuData) => {
+// editSpuBtn 函数会在点击"编辑 SPU"按钮时触发
+const editSpuBtn = (rowSpuData: SingleSpuData) => {
   // 切换为"展示"新增"和"编辑" SPU 时的界面"的场景
   sceneShift.value = 'AddOrUpdateSpu'
 
-  // editSpuDataRecall 方法用于实现 AddOrUpdateSpu 组件中的数据回显
+  // 子组件的 editSpuDataRecall 方法用于实现 AddOrUpdateSpu 组件中的"编辑"数据回显
   AddOrUpdateSpuRef.value?.editSpuDataRecall(rowSpuData)
 }
+
+// addSkuBtn 函数会在点击"添加 SKU"按钮时触发
+const addSkuBtn = () => {
+  console.log('addSkuBtn')
+}
 //#endregion --------------- "表格操作"相关的业务逻辑 ----------------------
+
+// SPU 路由组件销毁之前，清空本次添加的"分类"级别的相关数据，避免下次进入组件时还展示上次填写的数据
+// 即清空 categoryStore 小仓库中的"分类级别"相关的数据
+onBeforeUnmount(() => categoryStore.$reset())
 </script>
 
 <template>
@@ -109,7 +134,7 @@ const handleEditSpuBtn = (rowSpuData: SingleSpuData) => {
           type="primary"
           icon="Plus"
           :disabled="!thirdCategoryId"
-          @click="handleAddSpuBtn"
+          @click="addSpuBtn"
         >
           添加 SPU
         </el-button>
@@ -129,12 +154,10 @@ const handleEditSpuBtn = (rowSpuData: SingleSpuData) => {
           <el-table-column label="操作" align="center">
             <template #default="{ row }">
               <el-space size="large">
-                <el-button type="primary" icon="Plus">添加 SKU</el-button>
-                <el-button
-                  type="warning"
-                  icon="Edit"
-                  @click="handleEditSpuBtn(row)"
-                >
+                <el-button type="primary" icon="Plus" @click="addSkuBtn">
+                  添加 SKU
+                </el-button>
+                <el-button type="warning" icon="Edit" @click="editSpuBtn(row)">
                   编辑 SPU
                 </el-button>
                 <el-button type="info" icon="View">查看 SKU 列表</el-button>

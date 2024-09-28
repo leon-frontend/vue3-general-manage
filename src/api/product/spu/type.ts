@@ -70,7 +70,7 @@ export interface spuImgsResponseData extends ResponseData {
 export type SingleSaleAttrValue = {
   id?: number // 新增属性值是不用带 id 数据
   spuId?: number
-  baseSaleAttrId: number
+  baseSaleAttrId: number | string
   saleAttrValueName: string
   saleAttrName?: string
   isChecked?: null
@@ -83,6 +83,8 @@ export type SingleSaleAttr = {
   baseSaleAttrId: number | string
   saleAttrName: string
   spuSaleAttrValueList: SingleSaleAttrValue[]
+  isEditMode?: boolean
+  newSaleAttrValue?: string // 新添加的"销售属性值"
 }
 
 // 获取某个 SPU 下的所有"销售属性"的接口的 TS 类型
