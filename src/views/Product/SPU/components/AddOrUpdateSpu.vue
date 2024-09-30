@@ -17,17 +17,6 @@ import type {
   SingleSaleAttrValue,
 } from '@/api/product/spu/type'
 
-// 定义父组件给子组件绑定的自定义事件函数的回调函数的形参类型
-type EmitEvents = {
-  'change-scene': [
-    sceneStr: 'SpuTable' | 'AddOrUpdateSpu' | 'ViewSkuList',
-    addOrUpdate: 'Add' | 'Update',
-  ]
-}
-
-// 使用 defineEmits 获取父组件给子组件绑定的自定义事件
-const $emit = defineEmits<EmitEvents>()
-
 // completeSpuParams 用于保存"完整的 SPU"数据，并作为 reqAddOrUpdateSpu 请求的参数
 // "完整的 SPU"数据：由表格中的一行数据和其他数据拼接而成
 const completeSpuParams = ref<SingleSpuData>({
@@ -242,8 +231,20 @@ const editModeInputBlur = (rowSaleAttr: SingleSaleAttr) => {
 }
 //#endregion ---------------- "销售属性"相关的业务逻辑 ----------------------
 
+//#region ----------------- "保存"按钮和"取消"按钮的相关业务逻辑 --------------------
+// 定义父组件给子组件绑定的自定义事件函数的回调函数的形参类型
+type EmitEvents = {
+  'change-scene': [
+    sceneStr: 'SpuTable' | 'AddOrUpdateSpu' | 'AddSku',
+    tablePage: 'currentPage' | 'firstPage',
+  ]
+}
+
+// 使用 defineEmits 获取父组件给子组件绑定的自定义事件
+const $emit = defineEmits<EmitEvents>()
+
 // 点击"取消"按钮时会触发该函数，切换为"展示表格界面"的场景，并且显示离开"表格界面"时的数据
-const handleCancelBtn = () => $emit('change-scene', 'SpuTable', 'Update')
+const handleCancelBtn = () => $emit('change-scene', 'SpuTable', 'currentPage')
 
 // handleSaveBtn 函数会在点击"保存"按钮时触发
 const handleSaveBtn = async () => {
@@ -269,7 +270,7 @@ const handleSaveBtn = async () => {
     $emit(
       'change-scene',
       'SpuTable',
-      completeSpuParams.value.id ? 'Update' : 'Add',
+      completeSpuParams.value.id ? 'currentPage' : 'firstPage',
     )
   } catch (error) {
     // 请求发送失败，弹出提示信息
@@ -277,6 +278,7 @@ const handleSaveBtn = async () => {
     console.log(error)
   }
 }
+//#endregion -------------- "保存"按钮和"取消"按钮的相关业务逻辑 --------------------
 </script>
 
 <template>

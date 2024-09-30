@@ -91,8 +91,7 @@ router.beforeEach(async (to, from, next) => {
     if (to.path === '/login') next({ path: '/' })
     else {
       // 若用户信息存在，则直接放行；若用户信息不存在，则发送获取用户信息的请求之后，再放行
-      if (userName)
-        next() // 用户信息存在，直接放行
+      if (userName) next() // 用户信息存在，直接放行        
       else {
         // 用户信息不存在的情况
         try {

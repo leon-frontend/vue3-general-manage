@@ -11,15 +11,15 @@ const $route = useRoute()
 const setttingStore = useSettingStore()
 const { refresh } = storeToRefs(setttingStore)
 
-// 获取 userStore 仓库，并响应式解构出仓库中表示"用户姓名和头像"的响应式数据
-const userStore = useUserStore()
-const { userName, userAvatar } = storeToRefs(userStore)
-const { userLogout } = userStore
-
 // handleRefresh 作为"刷新"按钮的点击事件回调，点击按钮，修改 refresh 的值
 const handleRefresh = () => {
   refresh.value = !refresh.value
 }
+
+// 获取 userStore 仓库，并响应式解构出仓库中表示"用户姓名和头像"的响应式数据
+const userStore = useUserStore()
+const { userName, userAvatar } = storeToRefs(userStore)
+const { userLogout } = userStore
 
 // handleFullScreen 作为"全屏"按钮的点击事件回调
 const handleFullScreen = () => {

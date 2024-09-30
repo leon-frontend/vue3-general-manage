@@ -34,6 +34,7 @@ export type SingleAttrData = {
   categoryId: number | string // 起始值为空字符串
   categoryLevel: number
   attrValueList: SingleAttrValue[]
+  attrIdAndValueId?: string // 在"SPU 管理"页面中的"新增 SKU"场景中，保存属性和属性值的 id
 }
 
 // 基于"一级分类"、"二级分类"和"三级分类"获取已有的属性名和属性值的接口的 TS 类型
