@@ -60,11 +60,8 @@ router.beforeEach(async (to, _, next) => {
       } else {
         // 用户信息不存在的情况
         try {
-          // 发请求获取用户信息
-          await getUserInfo()
-
-          // 获取用户信息成功之后，放行
-          next()
+          await getUserInfo() // 发请求获取用户信息
+          next() // 获取用户信息成功之后，放行
         } catch (error) {
           /**
            * 发请求获取用户信息失败时（如 token 过期），会执行下面的代码
