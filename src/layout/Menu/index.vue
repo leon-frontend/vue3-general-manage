@@ -2,11 +2,8 @@
 <script setup lang="ts" name="Menu">
 import { useRouter } from 'vue-router'
 
-// 通过 useRouter hook 获取 $router, 实现编程式路由导航
-const $router = useRouter()
-
-// 接受父组件传递过来的路由信息
-defineProps(['menuList'])
+defineProps(['menuList']) // 接受父组件传递过来的路由信息
+const $router = useRouter() // 获取 $router, 实现编程式路由导航
 
 // 定义 handleRoute 函数形参的 TS 类型
 interface MenuItemRegistered {
@@ -15,9 +12,11 @@ interface MenuItemRegistered {
   active: boolean
 }
 
-// 点击菜单项时,进行路由跳转
+/**
+ * handleRoute 用于实现点击菜单项时,进行路由跳转
+ * @param item 是一个对象, 其中包含一个 index 属性, 该属性值表示路由路径
+ */
 const handleRoute = (item: MenuItemRegistered): void => {
-  // item 是一个对象, 其中包含一个 index 属性, 该属性值表示路由路径
   $router.push(item.index)
 }
 </script>

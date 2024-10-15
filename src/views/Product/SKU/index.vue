@@ -20,6 +20,7 @@ const total = ref<number>(0) // 展示数据总数
 const allSkuData = ref<SingleSkuData[]>([])
 
 // getAllSkuData 函数用于发送请求，获取 SKU 数据列表，更新相关的响应式数据，用于表格展示
+// 形参用于跳转到指定页数
 const getSkuListData = async (pager = 1) => {
   // 给 getSkuListData 的形参传递想要获取数据的页数，默认是获取第一页的数据
   pageNo.value = pager
@@ -42,7 +43,7 @@ onMounted(() => getSkuListData())
 const changePageNo = (newPageNo: number) => getSkuListData(newPageNo)
 
 // changePageSize 函数会在"分页器"的"页面展示的数据大小"发生变化时触发，并且会自动注入"新的数据大小"的值
-const changePageSize = () => getSkuListData() // 不带参数，展示第一页数据
+const changePageSize = () => getSkuListData() // 不带参数，切换大小后，展示第一页数据
 //#endregion -------------------- "数据初始化与展示"相关的业务逻辑 ---------------------------
 
 //#region -------------------- 与商品"上架"和"下架"相关的业务逻辑 ---------------------------

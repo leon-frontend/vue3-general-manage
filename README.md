@@ -254,3 +254,7 @@ allUploadImgs.value = imgsRes.data.map((item) => ({
   url: item.imgUrl,
 }))
 ```
+
+# 07. 注意
+
+- "添加"和"新增"功能**共用一个模板**时，通过判断数据中**是否存在 id 字段**来区分这两个功能。 

@@ -5,6 +5,5 @@ import { constantRoutes } from './routes'
 export default createRouter({
   history: createWebHashHistory(), // 使用hash模式
   routes: constantRoutes,
-  // 添加切换路由时的滚动行为
-  scrollBehavior: () => ({ left: 0, top: 0 }),
+  scrollBehavior: () => ({ left: 0, top: 0 }), // 添加切换路由时的滚动行为
 })

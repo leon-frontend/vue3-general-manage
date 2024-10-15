@@ -141,7 +141,7 @@ export const constantRoutes = [
   },
   // 当上面的路由都没有匹配上时，使用重定向匹配下面的任意路由
   {
-    name: 'Any',
+    name: 'Others',
     path: '/:pathMatch(.*)*',
     redirect: '/404',
     meta: {

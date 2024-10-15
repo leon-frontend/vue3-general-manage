@@ -45,7 +45,7 @@ const validatorTmName = (
     : callback('品牌名称的长度需要大于等于两位')
 }
 
-// validatorTmName 函数是表单校验 logoUrl 字段的自定义校验方法
+// validatorLogoUrl 函数是表单校验 logoUrl 字段的自定义校验方法
 const validatorLogoUrl = (
   _: unknown,
   value: string, // value 时图片文件的 url，是一个 string 类型
@@ -84,7 +84,7 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 }
 
 // 定义图片文件上传请求返回数据的 TS 类型
-type FileUploadResponseData = {
+type FileUploadResData = {
   code: number
   data: string // 图片文件的 URL 地址
   message: string
@@ -97,7 +97,7 @@ type FileUploadResponseData = {
  * @param uploadFile （第二个参数，此处省略）为图片文件的详细信息
  */
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
-  response: FileUploadResponseData,
+  response: FileUploadResData,
 ) => {
   // 在 modalTradeMarkData 响应式数据中收集品牌数据的图片文件地址
   props.modalTradeMarkData.logoUrl = response.data

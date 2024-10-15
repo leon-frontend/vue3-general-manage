@@ -66,7 +66,7 @@ const { thirdCategoryId } = storeToRefs(categoryStore)
 
 /**
  * getAllSpuData 函数用于获取"某个三级分类"下所有的 SPU 数据
- * @param pager 触发分页器的 current-change 事件时，会向其回调函数自动注入 pager 参数，表示更新后的当前页数
+ * @param pager 触发分页器的 current-change 事件时，会向其回调函数自动注入 pager 参数，表示更新后的当前页数，用于跳转到指定页数
  * @description 触发分页器的 size-change 事件时，会向其回调函数自动注入更新后的 pageSize 数据(更新后的页面展示数据的数量)，
  *              但是不会注入更新后的 pageNo 数据，所以给其设置一个默认值，让 pageSize 更新后，页面跳转到第一页
  */

@@ -8,9 +8,7 @@ const settingStore = useSettingStore()
 const { fold } = storeToRefs(settingStore)
 
 // changeIcon 用于切换菜单栏"折叠"和"展开"的图标
-const changeIcon = () => {
-  fold.value = !fold.value
-}
+const changeIcon = () => (fold.value = !fold.value)
 
 // 使用 useRoute 获取 route，使用 route.matched 获取当前匹配的路由
 const route = useRoute()

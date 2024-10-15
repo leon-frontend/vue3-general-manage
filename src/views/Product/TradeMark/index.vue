@@ -74,8 +74,8 @@ const clearValidateResults = () => {
   modalFormRef.value?.clearValidate('logoUrl')
 }
 
-// handleAddTradeMark 函数会在点击"添加品牌"按钮时触发
-const handleAddTradeMark = () => {
+// addTradeMark 函数会在点击"添加品牌"按钮时触发
+const addTradeMark = () => {
   // 先清空 modal 框中表单的所有字段
   modalTradeMarkData.tmName = ''
   modalTradeMarkData.logoUrl = ''
@@ -110,7 +110,7 @@ const handleTableEdit = (row: SingleTradeMarkData) => {
         type="primary"
         size="default"
         icon="Plus"
-        @click="handleAddTradeMark"
+        @click="addTradeMark"
       >
         添加品牌
       </el-button>
