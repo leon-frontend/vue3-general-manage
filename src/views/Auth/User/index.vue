@@ -25,6 +25,9 @@ const pageNo = ref<number>(1) // 控制分页器的当前页数
 const pageSize = ref<number>(5) // 控制每页展示的数据大小
 const total = ref<number>(0) // 展示数据总数
 
+// 用于存储用户输入的关键字，用于"搜索"功能
+const keyword = ref<string>('')
+
 // getAllUserAuthInfo 函数用于获取全部已有用户信息，形参用于跳转到指定页数
 const getAllUserAuthInfo = async (pager = 1) => {
   // 给 getAllUserAuthInfo 的形参传递想要获取数据的页数，默认是获取第一页的数据
@@ -54,9 +57,6 @@ const changePageNo = (newPageNo: number) => getAllUserAuthInfo(newPageNo)
 
 // changePageSize 函数会在"分页器"的"页面展示的数据大小"发生变化时触发，并且会自动注入"新的数据大小"的值
 const changePageSize = () => getAllUserAuthInfo() // 不带参数，切换大小后，展示第一页数据
-
-// 用于存储用户输入的关键字，用于"搜索"功能
-const keyword = ref<string>('')
 
 // searchUserAuthInfo 函数会在点击"搜索"按钮时触发
 const searchUserAuthInfo = () => {
@@ -127,7 +127,7 @@ const addUserAuthInfo = () => {
     username: '',
     name: '',
     password: '',
-    id: 0, // 清除"编辑模式"下的 id 字段信息
+    id: 0, // 清除上一次"编辑模式"下的 id 字段信息
   })
 
   isUserDrawerOpen.value = true // 显示"抽屉"组件
@@ -307,12 +307,13 @@ const roleDrawerConfirm = async () => {
         <el-form-item>
           <el-button
             type="primary"
+            size="large"
             :disabled="!keyword.trim().length"
             @click="searchUserAuthInfo"
           >
             搜索
           </el-button>
-          <el-button @click="searchResetBtn">重置</el-button>
+          <el-button size="large" @click="searchResetBtn">重置</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -407,7 +408,7 @@ const roleDrawerConfirm = async () => {
       />
     </el-card>
 
-    <!-- "抽屉"组件，用于"新增"和"修改"账号 -->
+    <!-- "抽屉"组件，用于"新增"和"修改"用户信息 -->
     <el-drawer
       v-model="isUserDrawerOpen"
       :title="userAuthInfoParams.id ? '编辑用户' : '添加用户'"
@@ -497,5 +498,6 @@ const roleDrawerConfirm = async () => {
 .form-container {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 </style>

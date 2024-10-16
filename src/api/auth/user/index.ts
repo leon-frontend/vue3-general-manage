@@ -33,7 +33,7 @@ export const reqAllUserAuthInfo = (
 export const reqAddOrUpdateUser = (userAuthInfo: SingleUserAuthInfo) => {
   // 如果 userAuthInfo 数据中存在 id 字段，则执行"修改用户信息"的操作
   if (userAuthInfo.id) {
-    return request.post<SingleUserAuthInfo, ResNullData>(
+    return request.put<SingleUserAuthInfo, ResNullData>(
       API.UPDATE_USER_URL,
       userAuthInfo,
     )
