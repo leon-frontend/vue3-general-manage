@@ -1,4 +1,4 @@
-<script setup lang="ts" name="Role">
+<script setup lang="ts" name="RoleAuth">
 import { nextTick, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import {
@@ -72,7 +72,7 @@ const roleDataParams = reactive<SingleRoleData>({
   roleName: '',
 })
 
-const isDialogOpen = ref<boolean>(false) // 控制对话框的显示与隐藏
+const isDialogShow = ref<boolean>(false) // 控制对话框的显示与隐藏
 const formRef = ref<FormInstance | null>(null) // formRef 用于获取 el-form 组件的实例
 
 // addRoleData 函数会在点击"添加角色"按钮时触发
@@ -83,7 +83,7 @@ const addRoleData = () => {
     id: 0, // 清除上一次"编辑模式"下的 id 字段信息
   })
 
-  isDialogOpen.value = true // 显示对话框
+  isDialogShow.value = true // 显示对话框
 
   // 清空"dialog"组件中上一次的校验提示信息，需要使用 nextTick 等待"抽屉"组件挂载到页面中
   nextTick(() => formRef.value?.clearValidate('roleName'))
@@ -91,7 +91,7 @@ const addRoleData = () => {
 
 // updateRoleData 函数会在点击表格中的"编辑"按钮时触发
 const updateRoleData = (rowRoleData: SingleRoleData) => {
-  isDialogOpen.value = true // 显示对话框
+  isDialogShow.value = true // 显示对话框
   Object.assign(roleDataParams, rowRoleData) // 点击"编辑"按钮时，实现数据回显
 
   // 清空"dialog"组件中上一次的校验提示信息，需要使用 nextTick 等待"抽屉"组件挂载到页面中
@@ -126,13 +126,13 @@ const dialogConfirm = async () => {
     // 响应体设计中有一个 code 属性：返回 200 表示请求成功；返回 201 表示请求失败
     if (code === 200) {
       // 请求响应成功后，做如下处理
-      isDialogOpen.value = false // 请求响应成功后，关闭"dialog"组件
+      isDialogShow.value = false // 请求响应成功后，关闭"dialog"组件
       ElMessage.success(roleDataParams.id ? '更新角色成功' : '添加角色成功')
 
       // 重新获取一遍数据，若是"新增角色"，则展示第一页的数据；若是"编辑角色"，则展示当前页的数据
       getAllRolesData(roleDataParams.id ? pageNo.value : 1)
     } else {
-      isDialogOpen.value = false // 请求响应失败后，关闭"dialog"组件
+      isDialogShow.value = false // 请求响应失败后，关闭"dialog"组件
       ElMessage.error(roleDataParams.id ? '更新角色失败' : '添加角色失败')
     }
   } catch (error) {
@@ -339,7 +339,7 @@ const drawerConfirm = async () => {
 
     <!-- dialog 对话框："新增"和"更新"角色数据 -->
     <el-dialog
-      v-model="isDialogOpen"
+      v-model="isDialogShow"
       :title="roleDataParams.id ? '更新角色' : '添加角色'"
       width="500"
     >
@@ -353,7 +353,7 @@ const drawerConfirm = async () => {
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="isDialogOpen = false">取消</el-button>
+          <el-button @click="isDialogShow = false">取消</el-button>
           <el-button type="primary" @click="dialogConfirm">确定</el-button>
         </div>
       </template>

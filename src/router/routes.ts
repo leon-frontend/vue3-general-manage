@@ -53,7 +53,7 @@ export const constantRoutes = [
     redirect: '/auth/user',
     children: [
       {
-        name: 'User',
+        name: 'UserAuth',
         path: '/auth/user',
         component: () => import('@/views/Auth/User/index.vue'),
         meta: {
@@ -62,7 +62,7 @@ export const constantRoutes = [
         },
       },
       {
-        name: 'Role',
+        name: 'RoleAuth',
         path: '/auth/role',
         component: () => import('@/views/Auth/Role/index.vue'),
         meta: {
@@ -71,12 +71,12 @@ export const constantRoutes = [
         },
       },
       {
-        name: 'Permission',
+        name: 'MenuAuth',
         path: '/auth/permission',
-        component: () => import('@/views/Auth/Permission/index.vue'),
+        component: () => import('@/views/Auth/Menu/index.vue'),
         meta: {
-          title: '权限管理', // 动态生成路由时展示的标题
-          icon: 'Monitor',
+          title: '菜单管理', // 动态生成路由时展示的标题
+          icon: 'MenuIcon',
         },
       },
     ],
