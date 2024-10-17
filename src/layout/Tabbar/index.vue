@@ -21,12 +21,12 @@ import { BreadCrumb, Setting } from '@/layout'
   height: 100%;
   display: flex;
   justify-content: space-between;
-  background-image: linear-gradient(
-    to right,
-    rgb(242, 239, 239),
-    rgb(236, 211, 211),
-    rgb(237, 184, 184)
-  );
+  // background-image: linear-gradient(
+  //   to right,
+  //   rgb(242, 239, 239),
+  //   rgb(236, 211, 211),
+  //   rgb(237, 184, 184)
+  // );
 
   .tabbar-left {
     display: flex;
@@ -37,7 +37,7 @@ import { BreadCrumb, Setting } from '@/layout'
   .tabbar-right {
     display: flex;
     align-items: center;
-    margin-right: 20px;
+    margin-right: 30px;
   }
 }
 </style>

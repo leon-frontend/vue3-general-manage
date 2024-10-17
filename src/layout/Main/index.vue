@@ -4,8 +4,8 @@ import { storeToRefs } from 'pinia'
 import { watch, ref, nextTick } from 'vue'
 
 // 获取 setttingStore 仓库，并响应式解构出仓库中的 refresh 响应式数据
-const setttingStore = useSettingStore()
-const { refresh } = storeToRefs(setttingStore)
+const settingStore = useSettingStore()
+const { refresh } = storeToRefs(settingStore)
 
 // isShow 响应式数据用于控制当前组件是否销毁重建（即是否展示在页面上）
 const isShow = ref(true)

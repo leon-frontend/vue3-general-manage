@@ -1,10 +1,7 @@
 <script setup lang="ts" name="TradeMarkTable">
 import { ElMessage } from 'element-plus'
 import { reqDeleteTradeMark } from '@/api/product/tradeMark'
-import type {
-  SingleTradeMarkData,
-  TradeMarkResponseNullData,
-} from '@/api/product/tradeMark/type'
+import type { SingleTradeMarkData } from '@/api/product/tradeMark/type'
 
 // 定义父组件传递过来的数据的 TS 类型
 interface Props {
@@ -14,23 +11,18 @@ interface Props {
   updatePageNo: (newPageNo: number) => number
 }
 
-// 使用 defineProps 接收父组件传递过来的数据
-const props = defineProps<Props>()
-
-// 使用 defineEmits 接收父组件给子组件绑定的自定义事件
-const emits = defineEmits(['edit-trademark'])
+const props = defineProps<Props>() // 接收父组件传递过来的数据
+const $emits = defineEmits(['edit-trademark']) // 接收父组件给子组件绑定的自定义事件
 
 // 点击表格中的"编辑"按钮会触发 handleEdit 函数
 const handleEdit = (tradeMarkData: SingleTradeMarkData) => {
-  emits('edit-trademark', tradeMarkData)
+  $emits('edit-trademark', tradeMarkData)
 }
 
 // 点击表格中的气泡确认框的"二次删除"按钮时，会触发 handleDelete 回调函数
 const handleDelete = async (id: number, tmName: string) => {
   // 发送删除某个品牌数据的请求
-  const result: TradeMarkResponseNullData = await reqDeleteTradeMark(
-    id as number,
-  )
+  const result = await reqDeleteTradeMark(id as number)
 
   // 如果返回的响应码是 200，表示响应成功
   if (result.code === 200) {

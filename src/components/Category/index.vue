@@ -46,14 +46,10 @@ const changeCategoryItem = (categoryLevel: 1 | 2) => {
     thirdCategoryId.value = ''
     allThirdCategory.value = []
 
-    // 当"一级分类"的值发生变化时，发送请求获取"二级分类"的数据
-    getSecondCategory()
+    getSecondCategory() // 当"一级分类"的值发生变化时，发送请求获取"二级分类"的数据
   } else {
-    // 当"二级分类"的值发生变化时，清空"三级分类"选择框中展示的数据
-    thirdCategoryId.value = ''
-
-    // 当"二级分类"的值发生变化时，发送请求获取"三级分类"的数据。
-    getThirdCategory()
+    thirdCategoryId.value = '' // 当"二级分类"的值发生变化时，清空"三级分类"选择框中展示的数据
+    getThirdCategory() // 当"二级分类"的值发生变化时，发送请求获取"三级分类"的数据。
   }
 }
 </script>
@@ -78,6 +74,7 @@ const changeCategoryItem = (categoryLevel: 1 | 2) => {
           />
         </el-select>
       </el-form-item>
+
       <!-- 二级分类 -->
       <el-form-item label="二级分类：">
         <el-select
@@ -94,6 +91,7 @@ const changeCategoryItem = (categoryLevel: 1 | 2) => {
           />
         </el-select>
       </el-form-item>
+
       <!-- 三级分类 -->
       <el-form-item label="三级分类：">
         <el-select

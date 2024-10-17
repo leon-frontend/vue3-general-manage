@@ -8,6 +8,7 @@ import globalComponent from '@/components' // 引入用于注册全局组件的�
 import '@/styles/index.scss' // 引入模板的全局样式
 import router from '@/router' // 引入路由模块
 import pinia from '@/store' // 引入pinia
+import 'element-plus/theme-chalk/dark/css-vars.css' // "暗黑模式"的样式文件
 
 const app = createApp(App)
 

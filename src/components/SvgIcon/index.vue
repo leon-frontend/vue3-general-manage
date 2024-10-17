@@ -1,4 +1,4 @@
-<script setup lang="ts" name="SvgICon">
+<script setup lang="ts" name="SvgIcon">
 // 使用defineProps接受父组件传递过来的参数，使用withDefaults设置默认值
 // prefix 表示表示SVG图标名的前缀，这个值是可传值且值是固定的，即#icon-
 // name 表示svg文件名，这个值是必传值，且不固定
@@ -28,4 +28,4 @@ withDefaults(
   </svg>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="scss" scoped></style>

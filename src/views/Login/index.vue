@@ -5,35 +5,30 @@ import { useRoute, useRouter } from 'vue-router'
 import { User, Lock } from '@element-plus/icons-vue'
 import { ElNotification } from 'element-plus'
 import { getTime } from '@/utils/time' // 引入获取当前时间的函数
+import type { FormInstance } from 'element-plus'
 
 // 收集用户名输入框和密码框中的数据
 const loginForm = reactive({ username: 'admin', password: '111111' })
 
-// 获取 el-form 组件实例
-const form = ref()
+//#region --------------- 点击登录按钮后,发送用户登录请求并跳转页面 --------------------
+const $router = useRouter() // 获取路由器
+const $route = useRoute() // 获取路由
+const userStore = useUserStore() // 创建 user 小仓库的实例
 
-// --------------- 点击登录按钮后,发送用户登录请求并跳转页面 --------------------
-// 获取路由器和路由
-const $router = useRouter()
-const $route = useRoute()
-
-// 创建user小仓库的实例
-const userStore = useUserStore()
-
-// 定义变量控制登录按钮的加载效果
-let loading = ref(false)
+const loading = ref(false) // 控制登录按钮的加载效果
+const formRef = ref<FormInstance | null>(null) // 获取 el-form 组件实例
 
 // handleLogin 函数作为登录按钮的回调函数
 const handleLogin = async () => {
-  // validate方法校验成功时会返回成功的Promise对象，校验失败时会返回失败的Promise对象
-  // 注意这里是在点击按钮的回调函数里获取子组件的方法，此时当前组件已经成功挂载，子组件必然已经挂载，所以能成功获取，不懂就看vue3/ref详解
-  await form.value.validate() // 所有的表单校验通过了再发送请求
-
-  // 只有当validate校验成功时，才会执行下面的代码
   loading.value = true // 点击按钮后，按钮立刻显示加载效果
 
   try {
-    await userStore.userLogin(loginForm)
+    // validate方法校验成功时会返回成功的Promise对象，校验失败时会返回失败的Promise对象
+    // 注意这里是在点击按钮的回调函数里获取子组件的方法，此时当前组件已经成功挂载，子组件必然已经挂载，所以能成功获取，不懂就看vue3/ref详解
+    await formRef.value?.validate() // 所有的表单校验通过了再发送请求
+
+    // 只有当 validate 校验成功时，才会执行下面的代码
+    await userStore.userLogin(loginForm) // 发送登录请求
 
     /**
      * 请求成功则利用编程式路由导航跳转页面
@@ -51,39 +46,35 @@ const handleLogin = async () => {
       title: `Hi,${getTime()}好`,
       message: '欢迎回来',
     })
-
-    // 登录成功后，结束加载效果
-    loading.value = false
   } catch (error) {
-    loading.value = false // 登录失败时，结束加载效果
-
-    // 请求失败则弹出失败信息
-    // 使用elementPlus中的组件展示登陆失败的提示信息
-    ElNotification({ type: 'error', message: (error as Error).message })
+    const errorMsg = (error as Error).message || '账号或密码不符合规定！'
+    ElNotification({ type: 'error', message: errorMsg }) // 登陆失败的提示信息
+  } finally {
+    loading.value = false // 无论"登录"是否成功，结束加载效果
   }
 }
+//#endregion ------------ 点击登录按钮后,发送用户登录请求并跳转页面 --------------------
 
-// -------------------- 表单校验 ------------------------
+//#region ------------------------- 表单校验 ----------------------------
+// 定义自定义校验规则函数的 TS 类型
+type ValidateFn = (
+  _: unknown,
+  value: string,
+  callback: (error?: Error) => void,
+) => void
+
 /**
  * 自定义校验规则:
  * validateUsernames 函数是自定义校验规则的函数
  * @param rule （使用占位符占位的参数）为校验规则对象, value 参数为表单元素的文本内容
  * @param callback 是一个函数，如果校验通过就调用该函数放行；如果校验没通过则调用该函数时传入 Error 错误信息
  */
-const validateUsername = (
-  _: unknown,
-  value: string,
-  callback: (error?: Error) => void,
-) => {
+const validateUsername: ValidateFn = (_, value, callback) => {
   if (value.length >= 5 && value.length <= 10) callback()
   else callback(new Error('账号长度至少5位，至多10位'))
 }
 
-const validatePassword = (
-  _: unknown,
-  value: string,
-  callback: (error?: Error) => void,
-) => {
+const validatePassword: ValidateFn = (_, value, callback) => {
   if (value.length >= 6 && value.length <= 10) callback()
   else callback(new Error('密码长度至少6位，至多10位'))
 }
@@ -99,9 +90,10 @@ const rules = {
 
   // 2. -------- 自定义校验规则 ---------
   // 配置validator属性和自定义校验函数
-  username: [{ validator: validateUsername, trigger: 'change' }],
-  password: [{ validator: validatePassword, trigger: 'change' }],
+  username: [{ validator: validateUsername, trigger: 'blur' }],
+  password: [{ validator: validatePassword, trigger: 'blur' }],
 }
+//#endregion ---------------------- 表单校验 ----------------------------
 </script>
 
 <template>
@@ -110,7 +102,7 @@ const rules = {
     <!-- el-row组件的gutter属性来指定列之间的间距，其默认值为0 -->
     <el-row>
       <!-- :xs="0"表示当屏幕宽度小于768px时，不展示该组件 -->
-      <el-col :span="13" :xs="0"></el-col>
+      <el-col :span="13" :xs="0" />
       <!-- :xs="24"表示当屏幕宽度小于768px时，占满一行 -->
       <el-col :span="11" :xs="24">
         <!-- :model="loginForm"属性指将表单数据收集到loginForm对象中 -->
@@ -120,17 +112,14 @@ const rules = {
           class="login_form"
           :model="loginForm"
           :rules="rules"
-          ref="form"
+          ref="formRef"
         >
           <h1>Hello</h1>
           <h2>WelCome to GuiGuZhenXuan</h2>
           <!-- 用户名输入框 -->
           <el-form-item prop="username">
             <!-- prop="username"属性表示需要进行校验的值,prop的值对应于rules对象中的属性名 -->
-            <el-input
-              :prefix-icon="User"
-              v-model="loginForm.username"
-            ></el-input>
+            <el-input :prefix-icon="User" v-model="loginForm.username" />
           </el-form-item>
           <!-- 密码输入框 -->
           <el-form-item prop="password">
@@ -140,7 +129,7 @@ const rules = {
               :prefix-icon="Lock"
               v-model="loginForm.password"
               show-password
-            ></el-input>
+            />
           </el-form-item>
           <!-- 登录按钮 -->
           <el-form-item>

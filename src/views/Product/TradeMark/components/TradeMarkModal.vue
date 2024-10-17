@@ -16,18 +16,17 @@ interface Props {
   getHasTradeMark: () => Promise<void>
 }
 
-// 使用 defineProps 接收父组件传递过来的数据
-const props = defineProps<Props>()
-
-// modalFormRef 表示 el-form 组件实例
-const modalFormRef = ref<FormInstance | null>(null)
-
-// 向父组件暴露 el-form 组件实例，让父组件使用
-defineExpose({ modalFormRef })
+const props = defineProps<Props>() // 接收父组件传递过来的数据
+const modalFormRef = ref<FormInstance | null>(null) // 获取 el-form 组件实例
+defineExpose({ modalFormRef }) // 向父组件暴露 el-form 组件实例，让父组件使用
 
 //#region ----------------- Modal 弹框中的表单校验 --------------------
-// 定义校验方法中的 callback 形参的 TS 类型
-type ValidatorCallback = (errorMessage?: string) => void
+// 定义自定义校验规则函数的 TS 类型
+type ValidateFn = (
+  _: unknown,
+  value: string,
+  callback: (errorMessage?: string) => void,
+) => void
 
 /**
  * validatorTmName 函数是表单校验 tmName 字段的自定义校验方法
@@ -35,22 +34,14 @@ type ValidatorCallback = (errorMessage?: string) => void
  * @param value 表示表单控件收集的数据
  * @param callback 校验成功时，调用该方法且不传递参数，表示放行；校验失败时，调用该方法且其参数为失败的信息。
  */
-const validatorTmName = (
-  _: unknown,
-  value: string,
-  callback: ValidatorCallback,
-) => {
+const validatorTmName: ValidateFn = (_, value, callback) => {
   value.trim().length >= 2
     ? callback()
     : callback('品牌名称的长度需要大于等于两位')
 }
 
 // validatorLogoUrl 函数是表单校验 logoUrl 字段的自定义校验方法
-const validatorLogoUrl = (
-  _: unknown,
-  value: string, // value 时图片文件的 url，是一个 string 类型
-  callback: ValidatorCallback,
-) => {
+const validatorLogoUrl: ValidateFn = (_, value, callback) => {
   value ? callback() : callback('请上传 Logo 图片')
 }
 
@@ -120,7 +111,6 @@ const handleModalConfirm = async () => {
 
     // 当返回的响应码是 200 时，表示响应成功
     if (result.code === 200) {
-      // 弹出提示信息
       ElMessage.success(
         props.modalTradeMarkData.id ? '编辑品牌成功' : '添加品牌成功',
       )
@@ -128,14 +118,12 @@ const handleModalConfirm = async () => {
       // 重新发送请求，获取更新后的数据（需要更新数据总数等等）
       props.getHasTradeMark()
     } else {
-      // 弹出提示信息
       ElMessage.error(
         props.modalTradeMarkData.id ? '编辑品牌失败' : '添加品牌失败',
       )
     }
 
-    // 隐藏 Modal 弹框
-    props.controlModalShow(false)
+    props.controlModalShow(false) // 隐藏 Modal 弹框
   } catch (error) {
     console.log('表单校验失败：', error)
   }
@@ -185,16 +173,10 @@ const handleModalConfirm = async () => {
     <!-- 使用具名插槽 footer 实现底部的两个按钮 -->
     <template #footer>
       <el-space size="large" style="margin-right: 20px">
-        <el-button
-          type="primary"
-          size="default"
-          @click="controlModalShow(false)"
-        >
+        <el-button type="primary" @click="controlModalShow(false)">
           取消
         </el-button>
-        <el-button type="primary" size="default" @click="handleModalConfirm">
-          确定
-        </el-button>
+        <el-button type="primary" @click="handleModalConfirm">确定</el-button>
       </el-space>
     </template>
   </el-dialog>
