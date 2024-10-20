@@ -255,7 +255,64 @@ allUploadImgs.value = imgsRes.data.map((item) => ({
 }))
 ```
 
-# 07. 注意
+# 07. 用户管理模块 & 权限分配
 
 - "添加"和"新增"功能**共用一个模板**时，通过判断数据中**是否存在 id 字段**来区分这两个功能。
 - **用户管理模块**：实现**给角色分配权限**的功能后，需要**刷新页面**，因为页面需要根据"新的权限数据"重新加载**路由**等信息。
+
+# 08. 智慧大屏
+
+- **"智慧大屏"的响应式展示**：重点在于**元素大小的适配**问题，让**数据内容展示在视口的中间位置**。
+  - 适配方案 1：**使用 vw 和 vh**。缺点是需要计算每个元素的大小相对于视口的百分比，并且**文本大小无法使用 vw 和 vh** 设置，只能使用 px 设置文本大小。
+  - 适配方式 2：**使用 scale 缩放属性（建议）**。配合 transform-origin 修改**变换原点为左上角**，并通过 **window.innerWidth(获取视口宽度)** 和 **window.innerHeight(获取视口高度)** 计算放大缩小的比例，并按照**较小的缩放比例**进行缩放。。**缺点**是按照较小的缩放比例进行缩放时，**四周容易出现留白区域**。
+- 动态获取当前时间：使用 moment 库 / dayjs 库。
+- eCharts 组件的容器**一定要设置高度**，否则无法正常显示图表。
+
+```html
+<!--------------------------- 响应式适配方式 2：使用 scale 缩放属性（建议） ------------------------------>
+<script setup lang="ts" name="Screen">
+// screenMainRef 获取"数据大屏的版心(内容展示区域)"的 DOM 元素
+const screenMainRef = ref<HTMLDivElement | null>(null)
+
+// getScaleRatio 函数用于根据当前屏幕大小动态获取缩放比例。默认屏幕大小是 1920 × 1080
+const getScaleRatio = (width = 1920, height = 1080) => {
+  const wRatio = window.innerWidth / width // 计算宽度的缩放比例，window.innerWidth 表示当前浏览器视口的宽度
+  const hRatio = window.innerHeight / height // 计算高度的缩放比例，window.innerHeight 表示当前浏览器视口的高度
+  return wRatio < hRatio ? wRatio : hRatio // 按照较小的缩放比例进行缩放，防止内容溢出或内容拉伸
+}
+
+// setScaleAndTranslate 用于动态设置缩放比例和位移大小
+const setScaleAndTranslate = () => {
+  if (screenMainRef.value)
+    screenMainRef.value.style.transform = `scale(${getScaleRatio()}) translate(-50%,-50%)`
+}
+
+// 动态设置缩放比例和位移大小的时机
+onMounted(() => setScaleAndTranslate()) // 组件初次挂载到页面上时，设置缩放比例和位移大小
+window.onresize = () => setScaleAndTranslate() // 视口尺寸发生变化时，动态设置比例和位移大小
+</script>
+
+<template>
+  <!-- 数据大屏的版心：内容展示区域 -->
+  <div ref="screenMainRef" class="screen-main"></div>
+</template>
+
+<style lang="scss" scoped>
+.screen-container {
+  width: 100vw;
+  height: 100vh;
+  background: url('@/assets/screenImgs/bg.png') no-repeat;
+  background-size: cover;
+
+  .screen-main {
+    position: fixed;
+    width: 1920px;
+    height: 1080px;
+    background-color: red;
+    top: 50%;
+    left: 50%;
+    transform-origin: left top; /* 修改变换原点为左上角 */
+  }
+}
+</style>
+```
