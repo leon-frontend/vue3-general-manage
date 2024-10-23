@@ -25,9 +25,10 @@ onMounted(() => {
         { name: 'Administration', max: 16000 },
         { name: 'Information Technology', max: 30000 },
         { name: 'Customer Support', max: 38000 },
-        { name: 'Development', max: 52000 },
+        { name: 'Development', max: 71000 },
         { name: 'Marketing', max: 25000 },
       ],
+      splitNumber: 5, // 设置分割的刻度数目
     },
     series: [
       {

@@ -43,18 +43,9 @@ const handleDelete = async (id: number, tmName: string) => {
 <template>
   <el-table :data="props.AllTradeMarkData" border style="margin: 20px 0">
     <!-- "序号"列 -->
-    <el-table-column
-      label="序号"
-      width="80"
-      align="center"
-      type="index"
-    ></el-table-column>
+    <el-table-column label="序号" width="80" align="center" type="index" />
     <!-- "品牌名称"列 -->
-    <el-table-column
-      label="品牌名称"
-      prop="tmName"
-      align="center"
-    ></el-table-column>
+    <el-table-column label="品牌名称" prop="tmName" align="center" />
     <!-- "品牌 LOGO"列，使用默认插槽自定义渲染图片结构 -->
     <el-table-column label="品牌 LOGO" align="center">
       <template #default="{ row }">
@@ -69,7 +60,12 @@ const handleDelete = async (id: number, tmName: string) => {
     <el-table-column label="品牌操作" align="center">
       <template #default="{ row }">
         <el-space size="large">
-          <el-button type="warning" icon="Edit" @click="handleEdit(row)">
+          <el-button
+            type="warning"
+            icon="Edit"
+            v-btns-auth="'btn.Trademark.update'"
+            @click="handleEdit(row)"
+          >
             编辑
           </el-button>
           <el-popconfirm
@@ -81,7 +77,13 @@ const handleDelete = async (id: number, tmName: string) => {
             @confirm="handleDelete(row.id, row.tmName)"
           >
             <template #reference>
-              <el-button type="danger" icon="Delete">删除</el-button>
+              <el-button
+                type="danger"
+                icon="Delete"
+                v-btns-auth="'btn.Trademark.remove'"
+              >
+                删除
+              </el-button>
             </template>
           </el-popconfirm>
         </el-space>

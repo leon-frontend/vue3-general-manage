@@ -31,7 +31,7 @@ const handleFullScreen = () => {
 
 //#region ------------------------ "退出登录"相关的业务逻辑 ------------------------------
 const userStore = useUserStore() // 获取 userStore 仓库
-const { userName, userAvatar } = storeToRefs(userStore) // 响应式解构数据
+const { username, userAvatar } = storeToRefs(userStore) // 响应式解构数据
 const { userLogout } = userStore // 普通解构方法
 
 /**
@@ -117,7 +117,7 @@ const changeDarkMode = () => {
   <!-- 下拉菜单 -->
   <el-dropdown class="dropdown">
     <el-button type="primary" plain>
-      {{ userName }}
+      {{ username }}
       <el-icon class="el-icon--right"><arrow-down /></el-icon>
     </el-button>
     <template #dropdown>

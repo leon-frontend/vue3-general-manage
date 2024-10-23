@@ -15,6 +15,8 @@ import { ElMessage } from 'element-plus'
 const allMenuPermission = ref<SingleMenuPermission[]>([])
 
 //#region --------------------- "数据初始化与展示"相关的业务逻辑 ---------------------------
+const isSkeletonLoading = ref<boolean>(true) // 控制"骨架屏"组件的显示与隐藏
+
 // getAllMenuPermission 函数用于获取全部已有"菜单权限"数据
 const getAllMenuPermission = async () => {
   try {
@@ -26,7 +28,16 @@ const getAllMenuPermission = async () => {
 }
 
 // 组件挂载到页面上时，获取全部已有"菜单权限"数据
-onMounted(() => getAllMenuPermission())
+onMounted(async () => {
+  isSkeletonLoading.value = true // 显示"骨架屏"组件
+
+  try {
+    await getAllMenuPermission() // 获取全部已有"菜单权限"数据
+    isSkeletonLoading.value = false // 请求响应成功后，隐藏"骨架屏"组件
+  } catch (error) {
+    console.log(error)
+  }
+})
 //#endregion ------------------ "数据初始化与展示"相关的业务逻辑 ---------------------------
 
 //#region --------------------- "新增"和"更新"菜单权限数据的业务逻辑 -------------------------
@@ -96,51 +107,53 @@ const deleteMenuBtn = async (rowMenu: SingleMenuPermission) => {
 <template>
   <div>
     <!-- 表格：展示"菜单权限"数据 -->
-    <el-table
-      :data="allMenuPermission"
-      style="width: 100%; margin-bottom: 20px"
-      row-key="id"
-      border
-    >
-      <el-table-column prop="name" label="名称" />
-      <el-table-column prop="code" label="权限值" />
-      <el-table-column prop="updateTime" label="修改时间" />
-      <el-table-column label="操作" align="center" width="350" fixed="right">
-        <template #default="{ row }">
-          <el-button
-            :type="row.level === 3 ? 'success' : 'primary'"
-            icon="Plus"
-            :disabled="row.level === 4"
-            @click="addMenuBtn(row)"
-          >
-            {{ row.level === 3 ? '添加功能' : '添加菜单' }}
-          </el-button>
-          <el-button
-            type="warning"
-            icon="Edit"
-            :disabled="row.level === 1"
-            @click="updateMenuBtn(row)"
-          >
-            编辑
-          </el-button>
-          <el-popconfirm
-            :title="`确定删除 ${row.name} ?`"
-            width="200"
-            @confirm="deleteMenuBtn(row)"
-          >
-            <template #reference>
-              <el-button
-                type="danger"
-                icon="Delete"
-                :disabled="row.level === 1"
-              >
-                删除
-              </el-button>
-            </template>
-          </el-popconfirm>
-        </template>
-      </el-table-column>
-    </el-table>
+    <el-skeleton :rows="10" :loading="isSkeletonLoading" animated>
+      <el-table
+        :data="allMenuPermission"
+        style="width: 100%; margin-bottom: 20px"
+        row-key="id"
+        border
+      >
+        <el-table-column prop="name" label="名称" />
+        <el-table-column prop="code" label="权限值" />
+        <el-table-column prop="updateTime" label="修改时间" />
+        <el-table-column label="操作" align="center" width="350" fixed="right">
+          <template #default="{ row }">
+            <el-button
+              :type="row.level === 3 ? 'success' : 'primary'"
+              icon="Plus"
+              :disabled="row.level === 4"
+              @click="addMenuBtn(row)"
+            >
+              {{ row.level === 3 ? '添加功能' : '添加菜单' }}
+            </el-button>
+            <el-button
+              type="warning"
+              icon="Edit"
+              :disabled="row.level === 1"
+              @click="updateMenuBtn(row)"
+            >
+              编辑
+            </el-button>
+            <el-popconfirm
+              :title="`确定删除 ${row.name} ?`"
+              width="200"
+              @confirm="deleteMenuBtn(row)"
+            >
+              <template #reference>
+                <el-button
+                  type="danger"
+                  icon="Delete"
+                  :disabled="row.level === 1"
+                >
+                  删除
+                </el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-skeleton>
 
     <!-- dialog 对话框：实现"菜单权限"数据的"新增和更新"操作 -->
     <el-dialog

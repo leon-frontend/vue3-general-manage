@@ -20,5 +20,10 @@ app.use(ElementPlus, {
 app.use(globalComponent) // 使用 use 方法安装自定义插件
 app.use(pinia) // 注册 pinia
 app.use(router) // 注册路由
-import '@/router/permission' // 引入路由鉴权的文件
+import '@/router/guard' // 引入路由鉴权的文件
+
+// 导入自定义指令，用于判断当前页面的按钮权限有哪些
+import { isBtnsAuth } from '@/directives/isBtnsAuth'
+isBtnsAuth(app) // 调用函数，注册局指令
+
 app.mount('#app')

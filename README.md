@@ -1,8 +1,8 @@
 # 00. 项目简介
 
-- **服务器域名**：http://sph-api.atguigu.cn
-- **接口文档 1**：http://139.198.104.58:8212/swagger-ui.html#/
-- **接口文档 2**：http://39.98.123.211:8510/swagger-ui.html
+- **服务器域名**：<http://sph-api.atguigu.cn>
+- **接口文档 1**：<http://139.198.104.58:8212/swagger-ui.html#/>
+- **接口文档 2**：<http://39.98.123.211:8510/swagger-ui.html>
 
 # 01. 路由切换 & 路由守卫
 
@@ -10,7 +10,7 @@
 
 - 文件位置：**`src/layout/Main/index.vue`**
 
-- 参考：https://router.vuejs.org/zh/guide/advanced/transitions.html
+- 参考：<https://router.vuejs.org/zh/guide/advanced/transitions.html>
 
 ```html
 <template>
@@ -83,7 +83,7 @@ router.beforeEach(async (to, from, next) => {
   nprogress.start() // 在前置守卫中开启进度条
 
   // 从 userStore 小仓库中获取 token、用户姓名和用户头像
-  const { token, userName, getUserInfo, userLogout } = userStore
+  const { token, username, getUserInfo, userLogout } = userStore
 
   // token 若存在，则表示用户已登录；token 若不存在，则表示用户未登录
   if (token) {
@@ -91,13 +91,17 @@ router.beforeEach(async (to, from, next) => {
     if (to.path === '/login') next({ path: '/' })
     else {
       // 若用户信息存在，则直接放行；若用户信息不存在，则发送获取用户信息的请求之后，再放行
-      if (userName)
+      if (username)
         next() // 用户信息存在，直接放行
       else {
         // 用户信息不存在的情况
         try {
           await getUserInfo() // 发请求获取用户信息
-          next() // 获取用户信息成功之后，放行
+          
+          // 注意：若刷新的时候是异步路由，有可能获取到了用户信息，但是异步路由还没有加载完毕，则出现"白屏情况"
+          // next({ ...to }) 的作用： 重新触发导航，确保新的路由配置或权限设置生效。
+          // 另外，通过对象展开运算符 { ...to }，创建了一个新的路由对象，避免了使用 next(to) 可能引起的导航循环问题。
+          next({ ...to }) // 获取用户信息成功之后，且异步路由组件加载完毕之后，再放行
         } catch (error) {
           // 发请求获取用户信息失败时（如 token 过期），会执行下面的代码
           userLogout() // 首先退出登录：清空用户的相关数据
@@ -271,25 +275,25 @@ allUploadImgs.value = imgsRes.data.map((item) => ({
 ```html
 <!--------------------------- 响应式适配方式 2：使用 scale 缩放属性（建议） ------------------------------>
 <script setup lang="ts" name="Screen">
-// screenMainRef 获取"数据大屏的版心(内容展示区域)"的 DOM 元素
-const screenMainRef = ref<HTMLDivElement | null>(null)
+  // screenMainRef 获取"数据大屏的版心(内容展示区域)"的 DOM 元素
+  const screenMainRef = ref<HTMLDivElement | null>(null)
 
-// getScaleRatio 函数用于根据当前屏幕大小动态获取缩放比例。默认屏幕大小是 1920 × 1080
-const getScaleRatio = (width = 1920, height = 1080) => {
-  const wRatio = window.innerWidth / width // 计算宽度的缩放比例，window.innerWidth 表示当前浏览器视口的宽度
-  const hRatio = window.innerHeight / height // 计算高度的缩放比例，window.innerHeight 表示当前浏览器视口的高度
-  return wRatio < hRatio ? wRatio : hRatio // 按照较小的缩放比例进行缩放，防止内容溢出或内容拉伸
-}
+  // getScaleRatio 函数用于根据当前屏幕大小动态获取缩放比例。默认屏幕大小是 1920 × 1080
+  const getScaleRatio = (width = 1920, height = 1080) => {
+    const wRatio = window.innerWidth / width // 计算宽度的缩放比例，window.innerWidth 表示当前浏览器视口的宽度
+    const hRatio = window.innerHeight / height // 计算高度的缩放比例，window.innerHeight 表示当前浏览器视口的高度
+    return wRatio < hRatio ? wRatio : hRatio // 按照较小的缩放比例进行缩放，防止内容溢出或内容拉伸
+  }
 
-// setScaleAndTranslate 用于动态设置缩放比例和位移大小
-const setScaleAndTranslate = () => {
-  if (screenMainRef.value)
-    screenMainRef.value.style.transform = `scale(${getScaleRatio()}) translate(-50%,-50%)`
-}
+  // setScaleAndTranslate 用于动态设置缩放比例和位移大小
+  const setScaleAndTranslate = () => {
+    if (screenMainRef.value)
+      screenMainRef.value.style.transform = `scale(${getScaleRatio()}) translate(-50%,-50%)`
+  }
 
-// 动态设置缩放比例和位移大小的时机
-onMounted(() => setScaleAndTranslate()) // 组件初次挂载到页面上时，设置缩放比例和位移大小
-window.onresize = () => setScaleAndTranslate() // 视口尺寸发生变化时，动态设置比例和位移大小
+  // 动态设置缩放比例和位移大小的时机
+  onMounted(() => setScaleAndTranslate()) // 组件初次挂载到页面上时，设置缩放比例和位移大小
+  window.onresize = () => setScaleAndTranslate() // 视口尺寸发生变化时，动态设置比例和位移大小
 </script>
 
 <template>
@@ -298,21 +302,137 @@ window.onresize = () => setScaleAndTranslate() // 视口尺寸发生变化时，
 </template>
 
 <style lang="scss" scoped>
-.screen-container {
-  width: 100vw;
-  height: 100vh;
-  background: url('@/assets/screenImgs/bg.png') no-repeat;
-  background-size: cover;
+  .screen-container {
+    width: 100vw;
+    height: 100vh;
+    background: url('@/assets/screenImgs/bg.png') no-repeat;
+    background-size: cover;
 
-  .screen-main {
-    position: fixed;
-    width: 1920px;
-    height: 1080px;
-    background-color: red;
-    top: 50%;
-    left: 50%;
-    transform-origin: left top; /* 修改变换原点为左上角 */
+    .screen-main {
+      position: fixed;
+      width: 1920px;
+      height: 1080px;
+      background-color: red;
+      top: 50%;
+      left: 50%;
+      transform-origin: left top; /* 修改变换原点为左上角 */
+    }
   }
-}
 </style>
 ```
+
+# 09. 导航菜单（路由）和按钮权限控制
+
+- **作用**：在同一个项目中，不同人的职位是不一样的，因此他能访问到的导航菜单（路由）和按钮的权限是不一样的。
+- 超级管理员账号：admin，密码：111111。所有的菜单和按钮都可以使用。
+
+- 飞行员账号（自己添加新"角色"）：pilot，密码：111111。不包含**权限管理菜单（路由）和按钮**的权限。
+
+## 9.1 导航菜单权限
+
+- **全部路由组件：**`login|404|Home|Screen|Auth(三个子路由)|Product(四个子路由)`
+- **静态（常量）路由**：所有用户都可以访问的路由。包括 `login|404|Home|Screen` 。
+- **异步路由**：需要根据"用户身份"才可以访问的路由，即该路由只能**被部分用户访问**。包括 `Auth(三个子路由)|Product(四个子路由)` 。
+- 用户登录时，服务端会返回包含**当前用户的菜单路由权限数据和按钮权限数据**，通过这个权限数据可以知道当前用户拥有哪些"异步路由"的访问权限。因此菜单路由权限控制的业务逻辑可以在**用户登录之后的时间段**内发生（ `store/modules/user.ts` 文件）。
+- **注意 1**：要保证路由规则中的 **name 属性值**和服务器返回的**路由字符串标识**一一对应。
+- **注意 2**：若**刷新的时候是异步路由**，有可能获取到了用户信息（ `router/guard.ts` 文件），但是**异步路由还没有加载完毕**，则出现"白屏情况"。使用 `next({ ...to })` **重新触发导航**，确保新的路由配置或权限设置生效。另外，通过对象展开运算符 { ...to }，创建了一个新的路由对象，**避免**了使用 `next(to)` 可能引起的**导航循环问题**。
+- **注意 3**：A 用户拥有所有页面的访问权限，比如"权限管理"模块中的"用户管理"页面；但是 **B 用户没有"用户管理"页面的访问权限**。问题如下：A 用户在"用户管理"页面中操作完之后退出登录，然后登录 B 用户，由于路由相关的设计是**再次登陆时会重定向到上次退出的页面**，所以此时 B 用户登录后会进入"用户管理"页面，但是由于 B 用户没有"用户管理"页面的访问权限，因此正确的操作**页面跳转到 404 页面**。
+  - **"退出登录"时移除动态添加的"异步路由" ( store/modules/user.ts 文件)**：在用户退出登录后，应该**移除与该用户权限相关的路由**，防止未授权的用户访问受限页面。移除动态添加的"异步路由"，可以确保路由表与当前用户的权限匹配，避免出现无权限的路由出现在导航菜单或被用户访问。如果不移除动态添加的路由，可能会在下次登录时发生路由重复添加的错误，或者导致权限紊乱，影响应用的正常运行。
+
+
+```ts
+/**
+ * 该函数用于从 asyncRoutes 异步路由中筛选出当前用户可以访问的异步路由。
+ * 该函数会在 getUserInfo 函数中调用，并且在获取用户数据之后调用。
+ * @param allAsyncRoutes 所有的异步路由数组
+ * @param userAsyncRoutes 当前用户能访问的异步路由数组，由字符串标识组成
+ */
+const getUserAsyncRoutes = (allAsyncRoutes: RouteRecordRaw[], userAsyncRoutesStr: string[]) => {
+  // 对 allAsyncRoutes 所有的异步路由进行筛选
+  return allAsyncRoutes.filter((curRoute) => {
+    // 在 userAsyncRoutes 用户能访问的路由中查找是否存在当前遍历的路由
+    if (userAsyncRoutesStr.includes(curRoute.name as string)) {
+      // 若存在，则继续查找 children 属性的孩子节点
+      if (curRoute.children && curRoute.children.length > 0) {
+        // 更新当前节点的孩子节点值为过滤后的数组
+        curRoute.children = getUserAsyncRoutes(curRoute.children, userAsyncRoutesStr)
+      }
+      return true // allAsyncRoutes.filter 函数的返回值
+    }
+  })
+}
+
+// --------------------- getUserAsyncRoutes 函数在获取用户数据之后调用 ----------------------
+// 获取当前用户"可以访问"的"异步路由"，注意使用深拷贝，防止修改 asyncRoutes 源数据
+const userAsyncRoutes = getUserAsyncRoutes(cloneDeep(asyncRoutes), data.routes)
+
+// 更新当前用户"可以访问"的"总路由"，即需要渲染的"菜单路由"
+menuRoutes.value = [...constantRoutes, ...userAsyncRoutes, ...anyRoutes]
+
+// 由于 router/index.ts 中只注册了常量路由，因此这里需要动态追加"异步路由"和"任意路由"
+// 以数组字面量开头的代码前面一定要加 ; 符号
+;[...userAsyncRoutes, ...anyRoutes].forEach((route) => router.addRoute(route))
+
+// ----------------------------- 2. 避免出现无权限的路由被用户访问 -----------------------------
+// 存储动态添加的"异步路由"名称，在"退出登录"时需要删除添加的"异步路由"
+const routeNames = ref<string[]>([])
+
+// userLogout 函数是用户退出登录时调用的方法
+const userLogout = async () => {
+  /**
+   * "退出登录"时移除动态添加的"异步路由"：在用户退出登录后，应该移除与该用户权限相关的路由，防止未授权的用户访问受限页面。
+   * 移除动态添加的"异步路由"，可以确保路由表与当前用户的权限匹配，避免出现无权限的路由出现在导航菜单或被用户访问。
+   * 防止路由冲突：如果不移除动态添加的路由，可能会在下次登录时发生路由重复添加的错误，或者导致权限紊乱，影响应用的正常运行。
+   */
+  routeNames.value.forEach((routeName) => router.removeRoute(routeName))
+  routeNames.value = [] // 清空记录的路由名称数组
+}
+
+// getUserInfo 函数用于获取用户数据的方法
+const getUserInfo = async () => {
+  // 由于 router/index.ts 中只注册了常量路由，因此这里需要动态追加"异步路由"和"任意路由"，动态添加路由时记录"异步路由"的名称
+  ;[...userAsyncRoutes, ...anyRoutes].forEach((route) => {
+    router.addRoute(route) // 动态添加"异步路由"和"任意路由"
+    routeNames.value.push(route.name as string) // 记录当前用户的"异步路由"名称
+  })
+}
+```
+
+## 9.2 按钮权限（以"品牌管理"页面中的按钮为例）
+
+- 用户登录时，服务端会返回包含**当前用户的按钮权限数据**，通过这个权限数据可以知道当前用户拥有哪些"按钮"的访问权限。在**用户登录之后的时间段**内（ `store/modules/user.ts` 文件）获取当前用户的按钮权限数据。
+- 使用**自定义指令**封装判断当前用户是否拥有某个按钮权限的操作。
+  - **注意**：在**组件以外**的地方使用 Pinia 中的小仓库时，需要根据 Pinia 大仓库来创建小仓库。
+
+```ts
+// ---------------------------- store/modules/user.ts 文件 -------------------------------
+const btnsAuth = ref<string[]>([]) // btnsAuth 用于存储"当前用户的按钮权限"
+
+// ---------------------------- 使用自定义指令判断当前用户是否拥有某个按钮权限 --------------------------
+import pinia from '@/store'
+import { useUserStore } from '@/store/modules'
+import type { App, DirectiveBinding } from 'vue'
+
+// 在组件以外的地方使用 Pinia 中的小仓库时，需要根据 Pinia 大仓库来创建小仓库。
+const userStore = useUserStore(pinia)
+
+// isBtnsAuth 函数用于自定义指令，用于判断当前页面的按钮权限有哪些
+export const isBtnsAuth = (app: App) => {
+  // 全局自定义指令：实现按钮权限
+  app.directive('btns-auth', {
+    // mounted 表示当指令绑定的元素被 挂载到页面中 时，会自动调用
+    // el 表示指令绑定到的元素；binding 是一个对象，通过 binding.value 获取传递给指令的值。
+    mounted: (el: HTMLElement, binding: DirectiveBinding<string>) => {
+      // 判断服务器返回的"按钮权限"数据中是否包含自定义指令绑定的值(某个组件的按钮值)。
+      if (!userStore.btnsAuth.includes(binding.value)) {
+        // 若不包含，直接删除相关按钮的 DOM
+        el.parentNode?.removeChild(el)
+      }
+    },
+  })
+}
+
+// ---------------- 在组件中使用自定义指令，其中 'btn.Trademark.remove' 是服务器返回的数据 ----------------
+<el-button type="danger" icon="Delete" v-btns-auth="'btn.Trademark.remove'">删除</el-button>
+```
+

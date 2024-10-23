@@ -1,8 +1,8 @@
 <script setup lang="ts" name="Layout">
+import { useRoute } from 'vue-router'
 import { Logo, Menu, Main, Tabbar } from '@/layout'
 import { useSettingStore, useUserStore } from '@/store/modules'
 import { storeToRefs } from 'pinia'
-import { useRoute } from 'vue-router'
 
 // 获取 Pinia 中的 userStore 仓库和 settingStore 仓库
 const userStore = useUserStore()

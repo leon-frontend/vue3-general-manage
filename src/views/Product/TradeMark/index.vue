@@ -110,6 +110,7 @@ const handleTableEdit = (row: SingleTradeMarkData) => {
         type="primary"
         size="default"
         icon="Plus"
+        v-btns-auth="'btn.Trademark.add'"
         @click="addTradeMark"
       >
         添加品牌

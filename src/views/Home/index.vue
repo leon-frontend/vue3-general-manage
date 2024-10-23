@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia'
 import { getTime } from '@/utils/time'
 
 const userStore = useUserStore() // 获取 userStore 小仓库
-const { userAvatar, userName } = storeToRefs(userStore) // 响应式解构仓库中的数据
+const { userAvatar, username } = storeToRefs(userStore) // 响应式解构仓库中的数据
 </script>
 
 <template>
@@ -13,7 +13,7 @@ const { userAvatar, userName } = storeToRefs(userStore) // 响应式解构仓库
       <div class="box">
         <el-image :src="userAvatar" class="avatar" />
         <div class="title-container">
-          <h1 class="title">{{ getTime() }}好！{{ userName }}</h1>
+          <h1 class="title">{{ getTime() }}好！{{ username }}</h1>
           <p class="subtitle">硅谷甄选运营平台</p>
         </div>
       </div>

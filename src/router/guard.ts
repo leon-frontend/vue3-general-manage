@@ -37,7 +37,7 @@ router.beforeEach(async (to, _, next) => {
   nprogress.start()
 
   // 从 userStore 小仓库中获取 token、用户姓名和用户头像
-  const { token, userName, getUserInfo, userLogout } = userStore
+  const { token, username, getUserInfo, userLogout } = userStore
 
   // token 若存在，则表示用户已登录；token 若不存在，则表示用户未登录
   if (token) {
@@ -55,13 +55,17 @@ router.beforeEach(async (to, _, next) => {
       next({ path: '/' })
     } else {
       // 若用户信息存在，则直接放行；若用户信息不存在，则发送获取用户信息的请求之后，再放行
-      if (userName) {
+      if (username) {
         next() // 用户信息存在，直接放行
       } else {
         // 用户信息不存在的情况
         try {
           await getUserInfo() // 发请求获取用户信息
-          next() // 获取用户信息成功之后，放行
+
+          // 注意：若刷新的时候是异步路由，有可能获取到了用户信息，但是异步路由还没有加载完毕，则出现"白屏情况"
+          // next({ ...to }) 的作用： 重新触发导航，确保新的路由配置或权限设置生效。
+          // 通过对象展开运算符 { ...to }，创建了一个新的路由对象，避免了使用 next(to) 可能引起的导航循环问题。
+          next({ ...to }) // 获取用户信息成功之后，且异步路由组件加载完毕之后，再放行
         } catch (error) {
           /**
            * 发请求获取用户信息失败时（如 token 过期），会执行下面的代码
